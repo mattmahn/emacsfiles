@@ -1,0 +1,681 @@
+#+TITLE: Literate Emacs Configuration
+#+OPTIONS: toc:3
+
+* Track Emacs load time
+
+#+BEGIN_SRC emacs-lisp
+  (defconst emacs-start-time (current-time))
+#+END_SRC
+
+* Garbage Collection
+
+#+BEGIN_SRC emacs-lisp
+  (setq gc-cons-threshold 20000000) ; 20MB
+#+END_SRC
+
+* Package management
+
+Let's use =use-package= for package loading because it's super nice.
+
+First, we need to enable Emacs's built-in package manager and configure the package repositories:
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (setq package-enable-at-startup nil)
+  (setq package-archives
+        '(("gnu"          . "https://elpa.gnu.org/packages/")
+          ("melpa"        . "https://melpa.org/packages/")
+          ("melpa-stable" . "https://stable.melpa.org/packages/")))
+#+END_SRC
+
+In order to keep my editor working smoothly, I'll only stick to stable versions of certain packages:
+#+BEGIN_SRC emacs-lisp
+  (setq package-pinned-packages
+        '(
+          (use-package . "melpa-stable")
+          ))
+#+END_SRC
+
+Now that Emacs knows where to get =use-package=, and to only use the version from MELPA stable, we can load it.
+
+#+BEGIN_SRC emacs-lisp
+  (package-initialize)
+
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (eval-when-compile
+    (require 'use-package))
+
+  ;;; always download all packages if not already downloaded
+  (setq use-package-always-ensure t)
+  ;;; keep stats about packages
+  (setq use-package-compute-statistics t)
+
+  (use-package diminish) ; no longer included with use-package by default
+
+  ;;; example use-package usage
+  ;; (use-package foo
+  ;;   :ensure t
+  ;;   :defer t
+  ;;   :if (display-graphic-p)
+  ;;   :commands (foo-all foo-super)
+  ;;   :mode "\\.mode\\'"
+  ;;   :diminish "f"
+  ;;   :init
+  ;;   (setq foo-variable t)
+  ;;   (evil-leader/set-key "fs" #'foo-super)
+  ;;   :config
+  ;;   (foo-mode 1))
+#+END_SRC
+
+** Package-specific configuration
+*** Emacs
+
+Sometimes it is necessary to restart Emacs from within Emacs.
+This makes it as easy as =M-x restart-emacs=.
+
+#+BEGIN_SRC emacs-lisp
+(use-package restart-emacs
+  :defer t)
+#+END_SRC
+
+*** evil-mode
+
+Emacs's editing sucks. Vim's modal editing is the best.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package evil-leader
+    :init
+    (setq evil-leader/in-all-states t)
+    :config
+    ;; load evil-leader first so it's initialized for evil-mode
+    (global-evil-leader-mode)
+    (evil-leader/set-leader ","))
+
+  (use-package evil
+    :config
+    (evil-mode t)
+    (setq evil-move-cursor-back nil)
+    ;; set initial evil state for particular modes
+    (cl-loop for (mode . state) in '((cider-test-report-mode . emacs)
+                                     (dired-mode             . normal)
+                                     (magit-mode             . normal)
+                                     (magit-status-mode      . emacs)
+                                     (magit-diff-mode        . normal)
+                                     (magit-log-mode         . normal)
+                                     (magit-process-mode     . normal)
+                                     (magit-popup-mode       . emacs)
+                                     ;; this allows vi-mode in shells
+                                     (term-mode              . emacs))
+             do (evil-set-initial-state mode state)))
+
+  (use-package evil-matchit
+    :config
+    (global-evil-matchit-mode 1))
+
+  (use-package evil-nerd-commenter
+    :defer t
+    :config
+    (evilnc-default-hotkeys))
+
+  (use-package evil-surround
+    :config
+    (global-evil-surround-mode 1)
+    ;; use non-spaced pairs when surrounding with an opening brace
+    (evil-add-to-alist
+     'evil-surround-pairs-alist
+     ?\( '("(" . ")")
+     ?\[ '("[" . "]")
+     ?\{ '("{" . "}")
+     ?\) '("( " . " )")
+     ?\] '("[ " . " ]")
+     ?\} '("{ " . " }")))
+
+  (use-package evil-visualstar
+    :config
+    (global-evil-visualstar-mode))
+
+  (use-package evil-search-highlight-persist
+    :config
+    (global-evil-search-highlight-persist t))
+#+END_SRC
+
+*** ripgrep
+
+=ripgrep= is the best {grep,ag,ucg,pt,sift}-like tool in existence. Peiod.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rg
+    :defer t)
+#+END_SRC
+
+**** TODO figure out what I want re key bindings
+*** Editorconfig
+
+Because auto-enforced consistence is lovely.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package editorconfig
+    :diminish "↹"
+    :init
+    (setq auto-mode-alist
+          (cl-union auto-mode-alist
+                    '(("\\.editorconfig\\'" . editorconfig-conf-mode)
+                      ("\\editorconfig\\'"  . editorconfig-conf-mode))))
+    :config
+    (editorconfig-mode 1))
+#+END_SRC
+*** projectile
+
+I need a nice project mangement tool, =projectile= will be that.
+Maybe I'll actually use it unlike vim's NerdTree.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :defer t
+    :diminish projectile-mode
+    :init
+    (setq projectile-require-project-root t)
+    :config
+    (setq projectile-globally-ignored-directories
+          (cl-union projectile-globally-ignored-directories
+                    '(".git"
+                      "Cargo.toml"
+                      "node_modules"
+                      "setup.py"
+                      "venv")))
+    (setq projectile-globally-ignored-files
+          (cl-union projectile-globally-ignored-files
+                    '(".DS_Store"
+                      "*.gz"
+                      "*.pyc"
+                      "*.png"
+                      "*.jpg"
+                      "*.jar"
+                      "*.svg"
+                      "*.tgz"
+                      "*.zip")))
+    (projectil-mode))
+#+END_SRC
+*** aggressive indentation
+
+Aggressively indent lines because it is (generally) more intuitive.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package aggressive-indent
+    :diminish "⇉"
+    :config
+    (global-aggressive-indent-mode t)
+    (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
+#+END_SRC
+
+** Auto-completion
+
+=company-mode= seems to be the defacto tool, so I'll start with that.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :diminish "⇥"
+    :config
+    (global-company-mode)
+    (company-tng-configure-default))
+#+END_SRC
+
+** Emoji
+
+C'mon, who doesn't like emoji!
+
+#+BEGIN_SRC emacs-lisp
+  (use-package emojify
+    :defer t
+    :init
+    (add-hook 'after-init-hook #'global-emojify-mode)
+    :config
+    (setq emojify-inhibit-major-modes
+          (cl-union emojify-inhibit-major-modes
+                    '(cider-mode
+                      cider-repl-mode
+                      cider-test-report-mode
+                      sql-mode
+                      term-mode
+                      web-mode
+                      yaml-mode))
+          emojify-prog-contexts "comments"))
+#+END_SRC
+
+** Environment merge
+
+There's an issue with Emacs on macOS where a command works in your shell, but not in Emacs. This ensures the enviroment variable inside Emacs are the same as your shell.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell
+    :if (memq window-system '(mac ns x))
+    :ensure t
+    :config
+    (exec-path-from-shell-initialize))
+#+END_SRC
+
+** Key binding discovery
+
+Sometimes remembering all the key bindings is really hard...
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :diminish which-key-mode
+    :config
+    (which-key-mode))
+#+END_SRC
+
+** Language support
+
+TODO, because there's too many...
+
+*** Docker
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dockerfile-mode
+    :mode "Dockerfile\\'")
+#+END_SRC
+
+*** JavaScript
+
+#+BEGIN_SRC emacs-lisp
+  (use-package js2-mode
+    :mode ("\\.js\\'"
+           "\\.mjs\\'")
+    :config
+    (electric-pair-mode t)
+    (evil-leader/set-key-for-mode 'js2-mode
+      "ds"  #'tern-get-docs  ; (d)oc (s)earch
+      ))
+
+  (use-package tern
+    :defer t
+    :init
+    (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+    :config
+    (setq tern-command (append tern-command '("--no-port-file"))))
+
+  (use-package company-tern
+    :hook tern-mode
+    :config
+    (add-to-list 'company-backends 'company-tern))
+
+  (use-package indium
+    :defer t
+    :init
+    (add-hook 'js2-mode-hook (lambda ()
+                               (require 'indium)
+                               (indium-interaction-mode)))
+    :config
+    (evil-leader/set-key-for-mode 'indium-repl-mode
+      "cr"  #'indium-repl-clear-output     ; (c)lear (r)epl
+      ))
+#+END_SRC
+
+*** JSON
+
+#+BEGIN_SRC emacs-lisp
+  (use-package json-mode
+    :defer t)
+#+END_SRC
+
+*** Lisps
+
+#+BEGIN_SRC emacs-lisp
+  (use-package emacs-lisp
+    :ensure nil
+    :defer t)
+#+END_SRC
+
+*** Markdown
+
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :mode ("\\.md\\'"
+           "\\.mkd\\'"
+           "\\.markdown\\'"))
+#+END_SRC
+
+*** Org
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-mode
+    :ensure nil
+    :defer t
+    :init
+    (setq org-insert-mode-line-in-empty-file t) ; for .txt file compatability
+    (setq org-ellipsis "⤵")
+    (setq org-startup-truncated nil) ; wrap lines, don't truncate.
+    (setq org-src-fontify-natively t)
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-window-setup 'current-window)
+    ;;; exporting
+    (setq org-export-with-smart-quotes t)
+    (setq org-html-postamble nil)
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (require 'ox-md)
+                (require 'ox-beamer)))
+
+    ;;; gtd settings
+    ;; (setq org-todo-keywords
+    ;;       '((sequence "TODO" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELLED")))
+    ;; (setq org-agenda-files '("~/Dropbox/org/"))
+    ;; (setq org-agenda-text-search-extra-files '(agenda-archives))
+    ;; (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
+    ;; (setq org-enforce-todo-dependencies t)
+    ;; (setq org-log-done (quote time))
+    ;; (setq org-log-redeadline (quote time))
+    ;; (setq org-log-reschedule (quote time))
+
+    ;;; keybinds pre load
+    (evil-leader/set-key-for-mode 'org-mode
+      "es" 'org-edit-special
+      "ri" 'ielm)
+    (evil-leader/set-key-for-mode 'emacs-lisp-mode
+      "cc" 'org-edit-src-exit
+      "cC" 'org-edit-src-abort))
+
+  (use-package org-bullets
+    :defer t
+    :init
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (org-bullets-mode t))))
+#+END_SRC
+*** Stylesheets
+
+#+BEGIN_SRC emacs-lisp
+  (use-package css-mode
+    :ensure nil
+    :mode "\\.css\\'"
+    :config
+    (electric-pair-mode t))
+
+  (use-package scss-mode
+    :mode ("\\.scss\\'"
+           "\\.sass\\'")
+    :config
+    (electric-pair-mode t))
+
+  ;; color hex color codes and such
+  ;;(use-package rainbow-mode
+  ;;  :defer t
+  ;;  :diminish rainbow-mode
+  ;;  :init
+  ;;  (add-hook 'css-mode-hook 'rainbow-mode)
+  ;;  (add-hook 'scss-mode-hook 'rainbow-mode))
+#+END_SRC
+
+*** Web
+
+I hear good things =web-mode=; let's play.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :mode ("\\.html\\'"
+           "\\.html\\.erb\\'"
+           "\\.php\\'"
+           "\\.jinja\\'"
+           "\\.j2\\'")
+    :init
+    ;; fix paren matching web-mode conflict for jinja-like templates
+    (add-hook
+     'web-mode-hook
+     (lambda ()
+       (setq-local electric-pair-inhibit-predicate
+                   (lambda (c)
+                     (if (char-equal c ?{) t (electric-pair-default-inhibit c))))))
+    :config
+    (setq web-mode-code-indent-offset 2
+          web-mode-css-indent-offset 2
+          web-mode-markup-indent-offset 2)
+    (evil-leader/set-key-for-mode 'web-mode
+      "fh" #'web-beautify-html))
+#+END_SRC
+
+*** YAML
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode
+    :mode ("\\.yml\\'"
+           "\\.yaml\\'"))
+#+END_SRC
+
+** Syntax checking / Linting
+
+Syntax checking / linting is super important for any text editor, so let's get one.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :defer t
+    :diminish "✓"
+    :init
+    (global-flycheck-mode)
+    :config
+    ;; disable documentation related emacs lisp checker
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed)))
+#+END_SRC
+
+** Terminal settings
+
+#+BEGIN_SRC emacs-lisp
+  (use-package multi-term
+    :defer t
+    :init
+    (setq multi-term-dedicated-window0height 30
+          multi-term-program "/usr/local/bin/zsh")
+    (add-hook 'term-mode-hook
+              (lambda ()
+                (setq term-buffer-maximum-size 10000
+                      yas-dont-activate t)
+                (setq-local scroll-margin 0
+                            scroll-conservatively 0
+                            scroll-step 1
+                            evil-emacs-state-cursor 'bar
+                            global-hl-line-mode nil))))
+#+END_SRC
+
+** UI niceties
+
+What's the most important part about a user interface? The font!
+
+#+BEGIN_SRC emacs-lisp
+  ;;(set-face-attibute 'default nil :family "PT Mono" :height 140 :weight 'normal)
+#+END_SRC
+
+I also need to turn off all those ugly bars.
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+  (when (display-graphic-p)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1))
+#+END_SRC
+
+I really don't understand why text editors don't have line numbers enabled by default... Let's turn them and relative numbers on:
+
+#+BEGIN_SRC emacs-lisp
+  (setq linum-relative-current-symbol "")
+  (global-linum-mode t)
+#+END_SRC
+
+Rainbow parenthesis are really nice to have, assuming it doesn't slow down your editor. They basically make it easy to spot matching parenthesis/braces/brackets.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-parentheses
+    :defer t
+    :init
+    (add-hook 'prog-mode-hook #'highlight-parentheses-mode)
+    (setq hl-paren-colors '("Springgreen3" "IndianRed1" "IndianRed3" "IndianRed4")))
+
+  ;; highlight matching parenthesis
+  (setq
+   show-paren-style 'parenthesis
+   show-paren-delay 0)
+  (show-paren-mode t)
+#+END_SRC
+
+Miscellaneous:
+#+BEGIN_SRC emacs-lisp
+  (global-prettify-symbols-mode)
+  ;;; highlight current line
+  (global-hl-line-mode)
+#+END_SRC
+
+*** Modeline
+
+First, lets declutter it:
+
+#+BEGIN_SRC emacs-lisp
+  (diminish 'auto-revert-mode "↺")
+  (diminish 'subword-mode)
+  (diminish 'undo-tree-mode)
+#+END_SRC
+
+Eventually I'll put a custom mode-line confiuration here...
+
+*** Scrolling
+
+#+BEGIN_SRC emacs-lisp
+  ;;; smoother
+  (setq scroll-margin 8
+        scroll-conservatively 100
+        scroll-step 1
+        ;; slower on a trackpad
+        mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil))
+        mouse-wheel-progressive-speed nil)
+#+END_SRC
+*** Themes
+
+#+BEGIN_SRC emacs-lisp
+  (use-package solarized-theme
+    :if (display-graphic-p)
+    :config
+    (load-theme 'solarized-dark t t)
+    (load-theme 'solarized-light t t))
+
+  (use-package ample-theme
+    :if (not (display-graphic-p))
+    :config
+    (load-theme 'ample-theme t t)
+    (load-theme 'ample-flat-theme t t))
+
+  (use-package spacemacs-theme
+    :defer t
+    :init
+    (load-theme 'spacemacs-dark t nil)
+    (load-theme 'spacemacs-light t t))
+#+END_SRC
+
+Sometimes its fun to cycle through themes too.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cycle-themes
+    :if (display-graphic-p)
+    :init
+    (setq cycle-themes-theme-list
+          '(solarized-dark
+            solarized-light))
+    :config
+    (evil-leader/set-key "ct" #'cycle-themes))
+#+END_SRC
+** Version control
+
+Magit is probably the git tool integrated into an editor. Now I just have to learn it...
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :defer t
+    :init
+    (evil-leader/set-key
+      "gg"  #'magit-dispatch-popup
+      "gs"  #'magit-status
+      "gd"  #'magit-diff-working-tree
+      "gco" #'magit-checkout
+      "gcb" #'magit-branch-and-checkout
+      "gl"  #'magit-pull-from-upstream
+      "gaa" #'magit-stage-modified
+      "gca" #'magit-commit
+      "gpu" #'magit-push-current-to-upstream
+      "gp"  #'magit-push-current-to-pushremote
+      "gt"  #'magit-tag)
+    ;; specific within magit-mode
+    (evil-leader/set-key-for-mode 'text-mode
+      "cc" 'with-editor-finish
+      "cC" 'with-editor-cancel)
+    :config
+    (setq truncate-lines nil) ; wrap lines
+    (define-key magit-status-mode-map (kbd "k") #'previous-line)
+    (define-key magit-status-mode-map (kbd "K") 'magit-discard)
+    (define-key magit-status-mode-map (kbd "j") #'next-line))
+#+END_SRC
+
+#+RESULTS:
+: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8 data (:use-package (23195 49193 474491 0) :init (23195 49193 474473 0) :init-secs (0 0 50158 0) :use-package-secs (0 0 50243 0)))
+
+I like to have an indicator of what lines changed. =diff-hl= does a pretty good job, but doesn't play too nice with Flycheck.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :defer t
+    :init
+    (add-hook 'after-init-hook 'global-diff-hl-mode)
+    (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+    :config
+    (diff-hl-flydiff-mode t)
+    (unless (display-graphic-p)
+      (diff hl-margin-mode t)))
+#+END_SRC
+
+* My functions
+
+#+BEGIN_SRC emacs-lisp
+  ;;; default to UTF-8
+  (prefer-coding-system 'utf-8)
+  (setq
+   ;; don't save customizations to init file
+   custom-file (concat user-emacs-directory ".emacs-customize.el")
+   ;; set spell check program to correct one
+   ispell-program-name "aspell"
+   require-final-newline t
+   )
+
+  ;;; open URLs in default browser
+  (when (display-graphic-p)
+    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
+#+END_SRC
+
+** Command aliases
+
+#+BEGIN_SRC emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
+** Escape evil
+
+Learning Emacs is way easier when ESC acts like it does in vim
+
+#+BEGIN_SRC emacs-lisp
+  (defun cs-minibuffer-keyboard-quit ()
+    "Abort recursive edit.
+  In Delete Selection mode, if the mark is active, just deactivate it;
+  then it takes a second \\[keyboard-quit] to abort the minibuffer."
+    (interactive)
+    (if (and delete-selection-mode transient-mark-mode mark-active)
+        (setq deactivate-mark  t)
+      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+      (abort-recursive-edit)))
+#+END_SRC
+* Show package load time
+
+Here's where we report how long it took to load all installed packages to the Messages buffer.
+
+#+BEGIN_SRC emacs-lisp
+  ;;; show package load time
+  (let ((elapsed (float-time (time-subtract (current-time)
+                                            emacs-start-time))))
+    (message "Loaded packages in %.3fs" elapsed))
+#+END_SRC

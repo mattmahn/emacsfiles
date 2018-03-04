@@ -1,0 +1,14 @@
+* emacsfiles
+
+Hello, and welcome to my Emacs configuration files.
+
+** Installation
+
+#+BEGIN_SRC shell
+  git clone https://github.com/mattmahn/emacsfiles.git ~/.emacsfiles
+  ln -sv ~/.emacsfiles/emacs.el ~/.emacs.el
+#+END_SRC
+
+** Used In
+
+- mattmahn/dotfiles
