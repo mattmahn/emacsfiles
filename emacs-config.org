@@ -285,7 +285,7 @@ TODO, because there's too many...
     :mode ("\\.js\\'"
            "\\.mjs\\'")
     :config
-    (electric-pair-mode t)
+    (electric-pair-mode 1)
     (evil-leader/set-key-for-mode 'js2-mode
       "ds"  #'tern-get-docs  ; (d)oc (s)earch
       ))
@@ -392,13 +392,13 @@ TODO, because there's too many...
     :ensure nil
     :mode "\\.css\\'"
     :config
-    (electric-pair-mode t))
+    (electric-pair-mode 1))
 
   (use-package scss-mode
     :mode ("\\.scss\\'"
            "\\.sass\\'")
     :config
-    (electric-pair-mode t))
+    (electric-pair-mode 1))
 
   ;; color hex color codes and such
   ;;(use-package rainbow-mode
