@@ -1,6 +1,10 @@
 #+TITLE: Literate Emacs Configuration
 #+OPTIONS: toc:3
 
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Matthew Mahnke")
+#+END_SRC
+
 * Track Emacs load time
 
 #+BEGIN_SRC emacs-lisp
@@ -47,9 +51,9 @@ Now that Emacs knows where to get =use-package=, and to only use the version fro
   (eval-when-compile
     (require 'use-package))
 
-  ;;; always download all packages if not already downloaded
+  ;; always download all packages if not already downloaded
   (setq use-package-always-ensure t)
-  ;;; keep stats about packages
+  ;; keep stats about packages
   (setq use-package-compute-statistics t)
 
   (use-package diminish) ; no longer included with use-package by default
@@ -78,6 +82,30 @@ This makes it as easy as =M-x restart-emacs=.
 #+BEGIN_SRC emacs-lisp
 (use-package restart-emacs
   :defer t)
+#+END_SRC
+
+It's also nice to have Emacs running in daemon mode, so it starts faster in subsequent invocations:
+#+BEGIN_SRC emacs-lisp
+  (use-package server
+    :ensure t
+    :if window-system
+    :init
+    (setq server-name "Matt's super secret Emacs server")
+    :config
+    (unless (server-running-p)
+      (add-hook 'after-init-hook 'server-start t)))
+#+END_SRC
+
+Auto-pair parentheses and such:
+#+BEGIN_SRC emacs-lisp
+  (electric-pair-mode 1)
+#+END_SRC
+
+Save histories:
+#+BEGIN_SRC emacs-lisp
+  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
+        savehist-file "~/.emacs.d/savehist")
+  (savehist-mode 1)
 #+END_SRC
 
 *** evil-mode
@@ -165,6 +193,9 @@ Because auto-enforced consistence is lovely.
                       ("\\editorconfig\\'"  . editorconfig-conf-mode))))
     :config
     (editorconfig-mode 1))
+
+  ;; set the default tab width (where I'd expec that to be configured)
+  (setq default-tab-width 4)
 #+END_SRC
 *** projectile
 
@@ -196,7 +227,7 @@ Maybe I'll actually use it unlike vim's NerdTree.
                       "*.svg"
                       "*.tgz"
                       "*.zip")))
-    (projectil-mode))
+    (projectile-mode))
 #+END_SRC
 *** aggressive indentation
 
@@ -220,6 +251,13 @@ Aggressively indent lines because it is (generally) more intuitive.
     :config
     (global-company-mode)
     (company-tng-configure-default))
+#+END_SRC
+
+Lets also get a help pop-up when dawdling on an auto-complete suggestion:
+#+BEGIN_SRC emacs-lisp
+  (use-package company-quickhelp
+    :init
+    (company-quickhelp-mode 1))
 #+END_SRC
 
 ** Emoji
@@ -267,6 +305,32 @@ Sometimes remembering all the key bindings is really hard...
     (which-key-mode))
 #+END_SRC
 
+** Language Server
+
+The Language Server Protocol is devleoped by Microsoft to provide more conventional IDE-like features to editors without needing to write a custom, complex backend.
+Instead, one only needs to write a client for the desired language's language server.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :disabled
+    :init
+    (add-hook 'prog-mode-hook 'lsp-mode)
+    :config
+    (use-package lsp-ui
+      :ensure f ; comes with lsp-mode
+      :config
+      (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
+#+END_SRC
+
+You can also use =company-mode= with LSP:
+#+BEGIN_SRC emacs-lisp
+  (use-package company-lsp
+    :disabled
+    :after (:all lsp-mode)
+    :config
+    (push 'company-lsp company-backends))
+#+END_SRC
+
 ** Language support
 
 TODO, because there's too many...
@@ -284,8 +348,11 @@ TODO, because there's too many...
   (use-package js2-mode
     :mode ("\\.js\\'"
            "\\.mjs\\'")
+    :init
+    (setq-default js2-ignored-warnings '("msg.extra.trailing.comma"
+                                         "msg.missing.semi"
+                                         "msg.no.side.effects"))
     :config
-    (electric-pair-mode 1)
     (evil-leader/set-key-for-mode 'js2-mode
       "ds"  #'tern-get-docs  ; (d)oc (s)earch
       ))
@@ -333,9 +400,17 @@ TODO, because there's too many...
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
+    :commands (markdown-mode gfm-mode)
     :mode ("\\.md\\'"
            "\\.mkd\\'"
-           "\\.markdown\\'"))
+           "\\.markdown\\'")
+    :init
+    (setq mardown-command "multimarkdown"))
+#+END_SRC
+
+To enable editing of code blocks in indirect buffers using =C-c '=:
+#+BEGIN_SRC emacs-lisp
+  (use-package edit-indirect)
 #+END_SRC
 
 *** Org
@@ -385,20 +460,29 @@ TODO, because there's too many...
               (lambda ()
                 (org-bullets-mode t))))
 #+END_SRC
+*** Rust
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rust-mode
+    :mode "\\.rs\\'"
+    :init
+    (setq rust-format-on-save t))
+
+  (use-package lsp-rust
+    :disabled
+    :after (:all lsp-mode))
+#+END_SRC
+
 *** Stylesheets
 
 #+BEGIN_SRC emacs-lisp
   (use-package css-mode
     :ensure nil
-    :mode "\\.css\\'"
-    :config
-    (electric-pair-mode 1))
+    :mode "\\.css\\'")
 
   (use-package scss-mode
     :mode ("\\.scss\\'"
-           "\\.sass\\'")
-    :config
-    (electric-pair-mode 1))
+           "\\.sass\\'"))
 
   ;; color hex color codes and such
   ;;(use-package rainbow-mode
@@ -456,7 +540,11 @@ Syntax checking / linting is super important for any text editor, so let's get o
     (global-flycheck-mode)
     :config
     ;; disable documentation related emacs lisp checker
-    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed)))
+    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed))
+    ;; disable JSHint because ESLint is better
+    (setq-default flycheck-disabled-checkers '(javascript-jshint))
+    ;; use the ESLint that's installed in node_modules before the global one
+    (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules))
 #+END_SRC
 
 ** Terminal settings
@@ -520,7 +608,7 @@ Rainbow parenthesis are really nice to have, assuming it doesn't slow down your 
 Miscellaneous:
 #+BEGIN_SRC emacs-lisp
   (global-prettify-symbols-mode)
-  ;;; highlight current line
+  ;; highlight current line
   (global-hl-line-mode)
 #+END_SRC
 
@@ -612,9 +700,6 @@ Magit is probably the git tool integrated into an editor. Now I just have to lea
     (define-key magit-status-mode-map (kbd "j") #'next-line))
 #+END_SRC
 
-#+RESULTS:
-: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8 data (:use-package (23195 49193 474491 0) :init (23195 49193 474473 0) :init-secs (0 0 50158 0) :use-package-secs (0 0 50243 0)))
-
 I like to have an indicator of what lines changed. =diff-hl= does a pretty good job, but doesn't play too nice with Flycheck.
 
 #+BEGIN_SRC emacs-lisp
@@ -633,8 +718,10 @@ I like to have an indicator of what lines changed. =diff-hl= does a pretty good 
 * My functions
 
 #+BEGIN_SRC emacs-lisp
-  ;;; default to UTF-8
+  ;; default to UTF-8
   (prefer-coding-system 'utf-8)
+  (set-language-environment "UTF-8")
+  (set-default-coding-systems 'utf-8)
   (setq
    ;; don't save customizations to init file
    custom-file (concat user-emacs-directory ".emacs-customize.el")
@@ -643,9 +730,24 @@ I like to have an indicator of what lines changed. =diff-hl= does a pretty good 
    require-final-newline t
    )
 
-  ;;; open URLs in default browser
+  ;; open URLs in default browser
   (when (display-graphic-p)
     (setq browse-url-browser-function 'browse-url-default-macosx-browser))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/use-eslint-from-node-modules ()
+    "Programmatically change ‘flycheck-javscript-eslint-executable’ to use the local node_modules version before the globally installed version.
+
+  The directories are searched recursively up the the tree until a match is found."
+    (let ((root (locate-dominating-file
+                 (or (buffer-file-name) default-directory)
+                 (lambda (dir)
+                   (let ((eslint (expand-file-name "node_modules/.bin/eslint" dir)))
+                     (and eslint (file-executable-p eslint)))))))
+      (when root
+        (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
+          (setq-local flycheck-javascript-eslint-executable eslint)))))
 #+END_SRC
 
 ** Command aliases
