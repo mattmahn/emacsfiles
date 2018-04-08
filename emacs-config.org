@@ -420,15 +420,15 @@ To enable editing of code blocks in indirect buffers using =C-c '=:
     :ensure nil
     :defer t
     :init
-    (setq org-insert-mode-line-in-empty-file t) ; for .txt file compatability
-    (setq org-ellipsis "...")
-    (setq org-startup-truncated nil) ; wrap lines, don't truncate.
-    (setq org-src-fontify-natively t)
-    (setq org-src-tab-acts-natively t)
-    (setq org-src-window-setup 'current-window)
-    ;;; exporting
-    (setq org-export-with-smart-quotes t)
-    (setq org-html-postamble nil)
+    (setq org-insert-mode-line-in-empty-file t ; for .txt file compatibility
+          org-ellipsis "..."
+          org-startup-truncated nil ; wrap lines, don't truncate
+          org-src-fontify-natively t
+          org-src-tab-acts-natively t
+          org-src-window-setup 'current-window)
+    ;; exporting
+    (setq org-export-with-smart-quotes t
+          org-html-postamble nil)
     (add-hook 'org-mode-hook
               (lambda ()
                 (require 'ox-md)
