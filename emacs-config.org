@@ -421,7 +421,7 @@ To enable editing of code blocks in indirect buffers using =C-c '=:
     :defer t
     :init
     (setq org-insert-mode-line-in-empty-file t) ; for .txt file compatability
-    (setq org-ellipsis "⤵")
+    (setq org-ellipsis "...")
     (setq org-startup-truncated nil) ; wrap lines, don't truncate.
     (setq org-src-fontify-natively t)
     (setq org-src-tab-acts-natively t)
@@ -528,6 +528,12 @@ I hear good things =web-mode=; let's play.
            "\\.yaml\\'"))
 #+END_SRC
 
+** Spell check
+Let's turn on Flyspell when in a text major mode and for comments & strings when in programming mode:
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'text-mode 'flyspell-mode)
+  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+#+END_SRC
 ** Syntax checking / Linting
 
 Syntax checking / linting is super important for any text editor, so let's get one.
