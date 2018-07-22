@@ -5,6 +5,41 @@
   (setq user-full-name "Matthew Mahnke")
 #+END_SRC
 
+* My functions
+
+#+BEGIN_SRC emacs-lisp
+  ;; default to UTF-8
+  (prefer-coding-system 'utf-8)
+  (set-language-environment "UTF-8")
+  (set-default-coding-systems 'utf-8)
+  (setq
+   ;; don't save customizations to init file
+   custom-file (concat user-emacs-directory ".emacs-customize.el")
+   ;; set spell check program to correct one
+   ispell-program-name "aspell"
+   require-final-newline t
+   )
+
+  ;; open URLs in default browser
+  (when (display-graphic-p)
+    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (defun my/use-eslint-from-node-modules ()
+    "Programmatically change ‘flycheck-javscript-eslint-executable’ to use the local node_modules version before the globally installed version.
+
+  The directories are searched recursively up the the tree until a match is found."
+    (let ((root (locate-dominating-file
+                 (or (buffer-file-name) default-directory)
+                 (lambda (dir)
+                   (let ((eslint (expand-file-name "node_modules/.bin/eslint" dir)))
+                     (and eslint (file-executable-p eslint)))))))
+      (when root
+        (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
+          (setq-local flycheck-javascript-eslint-executable eslint)))))
+#+END_SRC
+
 * Track Emacs load time
 
 #+BEGIN_SRC emacs-lisp
@@ -719,41 +754,6 @@ I like to have an indicator of what lines changed. =diff-hl= does a pretty good 
     (diff-hl-flydiff-mode t)
     (unless (display-graphic-p)
       (diff hl-margin-mode t)))
-#+END_SRC
-
-* My functions
-
-#+BEGIN_SRC emacs-lisp
-  ;; default to UTF-8
-  (prefer-coding-system 'utf-8)
-  (set-language-environment "UTF-8")
-  (set-default-coding-systems 'utf-8)
-  (setq
-   ;; don't save customizations to init file
-   custom-file (concat user-emacs-directory ".emacs-customize.el")
-   ;; set spell check program to correct one
-   ispell-program-name "aspell"
-   require-final-newline t
-   )
-
-  ;; open URLs in default browser
-  (when (display-graphic-p)
-    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (defun my/use-eslint-from-node-modules ()
-    "Programmatically change ‘flycheck-javscript-eslint-executable’ to use the local node_modules version before the globally installed version.
-
-  The directories are searched recursively up the the tree until a match is found."
-    (let ((root (locate-dominating-file
-                 (or (buffer-file-name) default-directory)
-                 (lambda (dir)
-                   (let ((eslint (expand-file-name "node_modules/.bin/eslint" dir)))
-                     (and eslint (file-executable-p eslint)))))))
-      (when root
-        (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
-          (setq-local flycheck-javascript-eslint-executable eslint)))))
 #+END_SRC
 
 ** Command aliases
