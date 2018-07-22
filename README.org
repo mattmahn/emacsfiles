@@ -6,7 +6,23 @@ Hello, and welcome to my Emacs configuration files.
 
 #+BEGIN_SRC shell
   git clone https://github.com/mattmahn/emacsfiles.git ~/.emacsfiles
-  ln -sv ~/.emacsfiles/emacs.el ~/.emacs.el
+#+END_SRC
+
+On Windows, set the =%HOME%= environment variable (probably to =%USERPROFILE%=).
+
+Find your Emacs configuration file by [[https://www.gnu.org/software/emacs/manual/html_node/efaq-w32/Location-of-init-file.html][reading the documentation]], or evaluating (=%HOME%= /will/ change this!)
+#+BEGIN_SRC emacs-lisp
+  (concat (expand-file-name user-emacs-directory) "init.el")
+#+END_SRC
+
+Symlink the emacs init file to this repo's =emacs.el=.
+On *nix:
+#+BEGIN_SRC shell
+  ln -sv ~/.emacsfiles/emacs.el "${PATH_FROM_ABOVE:-~/.emacs.el}"
+#+END_SRC
+On Windows (as admin, unless developer mode is enabled):
+#+BEGIN_SRC powershell
+  New-Item -Path "$PATH_FROM_ABOVE" -ItemType SymbolicLink -Value "$HOME\.emacsfiles\emacs.el"
 #+END_SRC
 
 ** Used In
