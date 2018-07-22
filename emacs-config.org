@@ -66,15 +66,7 @@ First, we need to enable Emacs's built-in package manager and configure the pack
           ("melpa-stable" . "https://stable.melpa.org/packages/")))
 #+END_SRC
 
-In order to keep my editor working smoothly, I'll only stick to stable versions of certain packages:
-#+BEGIN_SRC emacs-lisp
-  ;; (setq package-pinned-packages
-  ;;       '(
-  ;;         (use-package . "melpa-stable")
-  ;;         ))
-#+END_SRC
-
-Now that Emacs knows where to get =use-package=, and to only use the version from MELPA stable, we can load it.
+Now that Emacs knows where to get =use-package=.
 
 #+BEGIN_SRC emacs-lisp
   (package-initialize)
@@ -233,37 +225,38 @@ Because auto-enforced consistence is lovely.
   (setq default-tab-width 4)
 #+END_SRC
 *** projectile
-
 I need a nice project mangement tool, =projectile= will be that.
 Maybe I'll actually use it unlike vim's NerdTree.
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :defer t
+    :ensure t
+    :pin melpa-stable
     :diminish projectile-mode
     :init
-    (setq projectile-require-project-root t)
+    (setq projectile-require-project-root t
+	  projectile-completion-system 'ivy)
     :config
     (setq projectile-globally-ignored-directories
-          (cl-union projectile-globally-ignored-directories
-                    '(".git"
-                      "Cargo.toml"
-                      "node_modules"
-                      "setup.py"
-                      "venv")))
+	  (cl-union projectile-globally-ignored-directories
+		    '(".git"
+		      "node_modules"
+		      "setup.py"
+		      "venv")))
     (setq projectile-globally-ignored-files
-          (cl-union projectile-globally-ignored-files
-                    '(".DS_Store"
-                      "*.gz"
-                      "*.pyc"
-                      "*.png"
-                      "*.jpg"
-                      "*.jar"
-                      "*.svg"
-                      "*.tgz"
-                      "*.zip")))
-    (projectile-mode))
+	  (cl-union projectile-globally-ignored-files
+		    '(".DS_Store"
+		      "*.gz"
+		      "*.pyc"
+		      "*.png"
+		      "*.jpg"
+		      "*.jar"
+		      "*.svg"
+		      "*.tgz"
+		      "*.zip")))
+    (projectile-mode 1))
 #+END_SRC
+
 *** aggressive indentation
 
 Aggressively indent lines because it is (generally) more intuitive.
@@ -276,6 +269,15 @@ Aggressively indent lines because it is (generally) more intuitive.
     (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
 #+END_SRC
 
+*** Ivy
+Ivy is "an interactive interface for completion in Emacs."
+#+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :config
+    (setq ivy-use-virtual-buffers t
+	  ivy-count-format "(%d/%d) ")
+    (ivy-mode 1))
+#+END_SRC
 ** Auto-completion
 
 =company-mode= seems to be the defacto tool, so I'll start with that.
@@ -332,7 +334,6 @@ There's an issue with Emacs on macOS where a command works in your shell, but no
 ** Key binding discovery
 
 Sometimes remembering all the key bindings is really hard...
-
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :diminish which-key-mode
@@ -609,31 +610,42 @@ Syntax checking / linting is super important for any text editor, so let's get o
 
 ** UI niceties
 
-What's the most important part about a user interface? The font!
-
+Disable the annoying audible bell in lieu of a visible one:
 #+BEGIN_SRC emacs-lisp
-  ;;(set-face-attibute 'default nil :family "PT Mono" :height 140 :weight 'normal)
+  (setq visible-bell 1)
+#+END_SRC
+
+What's the most important part about a user interface? The font!
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(font . "Fira Code-9"))
+#+END_SRC
+
+Match the titlebar color on macOS
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearande . dark))
+  (setq ns-use-proxy-icon nil
+	frame-title-format nil)
 #+END_SRC
 
 I also need to turn off all those ugly bars.
 #+BEGIN_SRC emacs-lisp
-  (menu-bar-mode -1)
+  (menu-bar-mode 1)
   (when (display-graphic-p)
     (tool-bar-mode -1)
     (scroll-bar-mode -1))
 #+END_SRC
 
 I really don't understand why text editors don't have line numbers enabled by default... Let's turn them and relative numbers on:
-
 #+BEGIN_SRC emacs-lisp
   (setq linum-relative-current-symbol "")
   (global-linum-mode t)
 #+END_SRC
 
 Rainbow parenthesis are really nice to have, assuming it doesn't slow down your editor. They basically make it easy to spot matching parenthesis/braces/brackets.
-
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-parentheses
+    :ensure t
     :defer t
     :init
     (add-hook 'prog-mode-hook #'highlight-parentheses-mode)
@@ -671,7 +683,7 @@ Eventually I'll put a custom mode-line confiuration here...
   ;;; smoother
   (setq scroll-margin 8
         scroll-conservatively 100
-        scroll-step 1
+        scroll-step 2
         ;; slower on a trackpad
         mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil))
         mouse-wheel-progressive-speed nil)
@@ -712,10 +724,11 @@ Sometimes its fun to cycle through themes too.
 #+END_SRC
 ** Version control
 
-Magit is probably the git tool integrated into an editor. Now I just have to learn it...
+Magit is probably the best git tool integrated into an editor. Now I just have to learn it...
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
+    :ensure t
     :defer t
     :init
     (evil-leader/set-key
@@ -745,6 +758,7 @@ I like to have an indicator of what lines changed. =diff-hl= does a pretty good 
 
 #+BEGIN_SRC emacs-lisp
   (use-package diff-hl
+    :ensure t
     :defer t
     :init
     (add-hook 'after-init-hook 'global-diff-hl-mode)
