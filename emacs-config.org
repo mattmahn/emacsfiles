@@ -273,9 +273,10 @@ Aggressively indent lines because it is (generally) more intuitive.
 Ivy is "an interactive interface for completion in Emacs."
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
+    :pin melpa-stable
     :config
     (setq ivy-use-virtual-buffers t
-	  ivy-count-format "(%d/%d) ")
+          ivy-count-format "(%d/%d) ")
     (ivy-mode 1))
 #+END_SRC
 ** Auto-completion
@@ -353,7 +354,6 @@ Instead, one only needs to write a client for the desired language's language se
     (add-hook 'prog-mode-hook 'lsp-mode))
 
   (use-package lsp-ui
-    :ensure lsp-mode ; comes with lsp-mode
     :after (:all lsp-mode)
     :config
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
@@ -624,9 +624,9 @@ Syntax checking / linting is super important for any text editor, so let's get o
 
 ** UI niceties
 
-Disable the annoying audible bell in lieu of a visible one:
+Disable the annoying bell:
 #+BEGIN_SRC emacs-lisp
-  (setq visible-bell 1)
+  (setq ring-bell-function 'ignore)
 #+END_SRC
 
 What's the most important part about a user interface? The font!
