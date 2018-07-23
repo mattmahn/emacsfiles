@@ -348,21 +348,22 @@ Instead, one only needs to write a client for the desired language's language se
 
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
-    :disabled
-    :init
-    (add-hook 'prog-mode-hook 'lsp-mode)
+    :pin melpa-stable
     :config
-    (use-package lsp-ui
-      :ensure f ; comes with lsp-mode
-      :config
-      (add-hook 'lsp-mode-hook 'lsp-ui-mode)))
+    (add-hook 'prog-mode-hook 'lsp-mode))
+
+  (use-package lsp-ui
+    :ensure lsp-mode ; comes with lsp-mode
+    :after (:all lsp-mode)
+    :config
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
 #+END_SRC
 
 You can also use =company-mode= with LSP:
 #+BEGIN_SRC emacs-lisp
   (use-package company-lsp
-    :disabled
-    :after (:all lsp-mode)
+    :after (:all lsp-mode company)
     :config
     (push 'company-lsp company-backends))
 #+END_SRC
@@ -505,8 +506,9 @@ To enable editing of code blocks in indirect buffers using =C-c '=:
     (setq rust-format-on-save t))
 
   (use-package lsp-rust
-    :disabled
-    :after (:all lsp-mode))
+    :after (:all rust-mode lsp-mode)
+    :init
+    (setq lsp-rust-rls-command '("rls")))
 #+END_SRC
 
 *** Stylesheets
@@ -527,6 +529,18 @@ To enable editing of code blocks in indirect buffers using =C-c '=:
   ;;  :init
   ;;  (add-hook 'css-mode-hook 'rainbow-mode)
   ;;  (add-hook 'scss-mode-hook 'rainbow-mode))
+#+END_SRC
+
+*** Terraform
+#+BEGIN_SRC emacs-lisp
+  (use-package terraform-mode)
+#+END_SRC
+*** TOML
+
+Gotta have TOML support for Rust! (and other things)
+#+BEGIN_SRC emacs-lisp
+  (use-package toml-mode
+    :defer t)
 #+END_SRC
 
 *** Web
@@ -578,9 +592,9 @@ Syntax checking / linting is super important for any text editor, so let's get o
   (use-package flycheck
     :defer t
     :diminish "✓"
-    :init
-    (global-flycheck-mode)
+    ;:init
     :config
+    (add-hook 'after-init-hook 'global-flycheck-mode)
     ;; disable documentation related emacs lisp checker
     (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed))
     ;; disable JSHint because ESLint is better
