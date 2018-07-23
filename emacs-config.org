@@ -227,7 +227,6 @@ Because auto-enforced consistence is lovely.
 *** projectile
 I need a nice project mangement tool, =projectile= will be that.
 Maybe I'll actually use it unlike vim's NerdTree.
-
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure t
@@ -235,25 +234,24 @@ Maybe I'll actually use it unlike vim's NerdTree.
     :diminish projectile-mode
     :init
     (setq projectile-require-project-root t
-	  projectile-completion-system 'ivy)
+          projectile-completion-system 'ivy)
     :config
     (setq projectile-globally-ignored-directories
-	  (cl-union projectile-globally-ignored-directories
-		    '(".git"
-		      "node_modules"
-		      "setup.py"
-		      "venv")))
+          (cl-union projectile-globally-ignored-directories
+                    '(".git"
+                      "node_modules"
+                      "venv")))
     (setq projectile-globally-ignored-files
-	  (cl-union projectile-globally-ignored-files
-		    '(".DS_Store"
-		      "*.gz"
-		      "*.pyc"
-		      "*.png"
-		      "*.jpg"
-		      "*.jar"
-		      "*.svg"
-		      "*.tgz"
-		      "*.zip")))
+          (cl-union projectile-globally-ignored-files
+                    '(".DS_Store"
+                      "*.gz"
+                      "*.pyc"
+                      "*.png"
+                      "*.jpg"
+                      "*.jar"
+                      "*.svg"
+                      "*.tgz"
+                      "*.zip")))
     (projectile-mode 1))
 #+END_SRC
 
@@ -631,7 +629,9 @@ Disable the annoying bell:
 
 What's the most important part about a user interface? The font!
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(font . "Fira Code-9"))
+  (if (eq system-type 'darwin)
+      (add-to-list 'default-frame-alist '(font . "Fira Code-12"))
+    (add-to-list 'default-frame-alist '(font . "Fira Code-9")))
 #+END_SRC
 
 Match the titlebar color on macOS
