@@ -460,7 +460,9 @@ To enable editing of code blocks in indirect buffers using =C-c '=:
           org-startup-truncated nil ; wrap lines, don't truncate
           org-src-fontify-natively t
           org-src-tab-acts-natively t
-          org-src-window-setup 'current-window)
+          org-src-window-setup 'current-window
+          org-M-RET-may-split-line '((default . nil)) ; prevent M-RET from splitting lines
+          )
     ;; exporting
     (setq org-export-with-smart-quotes t
           org-html-postamble nil)
@@ -621,6 +623,10 @@ Syntax checking / linting is super important for any text editor, so let's get o
 #+END_SRC
 
 ** UI niceties
+Break lines at word boundries instead of in the middle of words:
+#+BEGIN_SRC emacs-lisp
+  (global-visual-line-mode 1)
+#+END_SRC
 
 Disable the annoying bell:
 #+BEGIN_SRC emacs-lisp
@@ -791,7 +797,6 @@ I like to have an indicator of what lines changed. =diff-hl= does a pretty good 
 #+END_SRC
 
 ** Escape evil
-
 Learning Emacs is way easier when ESC acts like it does in vim
 
 #+BEGIN_SRC emacs-lisp
