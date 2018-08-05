@@ -285,6 +285,8 @@ Ivy is "an interactive interface for completion in Emacs."
   (use-package company
     :diminish "⇥"
     :config
+    (setq company-idle-delay 0
+	  company-minimum-prefix-length 2)
     (global-company-mode)
     (company-tng-configure-default))
 #+END_SRC
