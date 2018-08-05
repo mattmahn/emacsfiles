@@ -343,9 +343,8 @@ Sometimes remembering all the key bindings is really hard...
 #+END_SRC
 
 ** Language Server
-
-The Language Server Protocol is devleoped by Microsoft to provide more conventional IDE-like features to editors without needing to write a custom, complex backend.
-Instead, one only needs to write a client for the desired language's language server.
+   The Language Server Protocol is devleoped by Microsoft to provide more conventional IDE-like features to editors without needing to write a custom, complex backend.
+   Instead, one only needs to write a client for the desired language's language server.
 
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
@@ -371,8 +370,7 @@ You can also use =company-mode= with LSP:
 #+END_SRC
 
 ** Language support
-
-TODO, because there's too many...
+   TODO, because there's too many...
 
 *** Docker
 
@@ -386,34 +384,24 @@ TODO, because there's too many...
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :mode ("\\.js\\'"
-           "\\.mjs\\'")
+	   "\\.mjs\\'")
     :init
     (setq-default js2-ignored-warnings '("msg.extra.trailing.comma"
-                                         "msg.missing.semi"
-                                         "msg.no.side.effects"))
-    :config
-    (evil-leader/set-key-for-mode 'js2-mode
-      "ds"  #'tern-get-docs  ; (d)oc (s)earch
-      ))
+					 "msg.missing.semi"
+					 "msg.no.side.effects")))
 
-  (use-package tern
-    :defer t
-    :init
-    (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+  (use-package lsp-javascript-typescript
+    :ensure t
     :config
-    (setq tern-command (append tern-command '("--no-port-file"))))
-
-  (use-package company-tern
-    :hook tern-mode
-    :config
-    (add-to-list 'company-backends 'company-tern))
+    (add-hook 'js2-mode-hook #'lsp-javascript-typescript-enable)
+    (add-hook 'typescript-mode-hook #'lsp-javascript-typescript-enable))
 
   (use-package indium
     :defer t
     :init
     (add-hook 'js2-mode-hook (lambda ()
-                               (require 'indium)
-                               (indium-interaction-mode)))
+			       (require 'indium)
+			       (indium-interaction-mode)))
     :config
     (evil-leader/set-key-for-mode 'indium-repl-mode
       "cr"  #'indium-repl-clear-output     ; (c)lear (r)epl
