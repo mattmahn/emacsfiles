@@ -383,29 +383,29 @@ You can also use =company-mode= with LSP:
     The LSP client for JavaScript/TypeScript needs to be intlled via npm before you can use it: =npm install -g javascript-typescript-langserver=.
     #+BEGIN_SRC emacs-lisp
       (use-package js2-mode
-	:mode ("\\.js\\'"
-	       "\\.mjs\\'")
-	:init
-	(setq-default js2-ignored-warnings '("msg.extra.trailing.comma"
-					     "msg.missing.semi"
-					     "msg.no.side.effects")))
+        :mode ("\\.js\\'"
+               "\\.mjs\\'")
+        :init
+        (setq-default js2-ignored-warnings '("msg.extra.trailing.comma"
+                                             "msg.missing.semi"
+                                             "msg.no.side.effects")))
 
       (use-package lsp-javascript-typescript
-	:ensure t
-	:config
-	(add-hook 'js2-mode-hook #'lsp-javascript-typescript-enable)
-	(add-hook 'typescript-mode-hook #'lsp-javascript-typescript-enable))
+        :ensure t
+        :config
+        (add-hook 'js2-mode-hook #'lsp-javascript-typescript-enable)
+        (add-hook 'typescript-mode-hook #'lsp-javascript-typescript-enable))
 
       (use-package indium
-	:defer t
-	:init
-	(add-hook 'js2-mode-hook (lambda ()
-				   (require 'indium)
-				   (indium-interaction-mode)))
-	:config
-	(evil-leader/set-key-for-mode 'indium-repl-mode
-	  "cr"  #'indium-repl-clear-output     ; (c)lear (r)epl
-	  ))
+        :defer t
+        :init
+        (add-hook 'js2-mode-hook (lambda ()
+                                   (require 'indium)
+                                   (indium-interaction-mode)))
+        :config
+        (evil-leader/set-key-for-mode 'indium-repl-mode
+          "cr"  #'indium-repl-clear-output     ; (c)lear (r)epl
+          ))
     #+END_SRC
 
 *** JSON
