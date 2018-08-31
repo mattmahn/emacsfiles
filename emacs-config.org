@@ -136,65 +136,62 @@ Save histories:
 #+END_SRC
 
 *** evil-mode
+    Emacs's editing sucks. Vim's modal editing is the best.
+    #+BEGIN_SRC emacs-lisp
+      (use-package evil-leader
+	:init
+	(setq evil-leader/in-all-states t)
+	:config
+	;; load evil-leader first so it's initialized for evil-mode
+	(global-evil-leader-mode)
+	(evil-leader/set-leader ","))
 
-Emacs's editing sucks. Vim's modal editing is the best.
+      (use-package evil
+	:config
+	(evil-mode t)
+	(setq evil-move-cursor-back nil)
+	;; set initial evil state for particular modes
+	(cl-loop for (mode . state) in '((cider-test-report-mode . emacs)
+					 (dired-mode             . normal)
+					 (magit-mode             . normal)
+					 (magit-status-mode      . emacs)
+					 (magit-diff-mode        . normal)
+					 (magit-log-mode         . normal)
+					 (magit-process-mode     . normal)
+					 (magit-popup-mode       . emacs)
+					 ;; this allows vi-mode in shells
+					 (term-mode              . emacs))
+		 do (evil-set-initial-state mode state)))
 
-#+BEGIN_SRC emacs-lisp
-  (use-package evil-leader
-    :init
-    (setq evil-leader/in-all-states t)
-    :config
-    ;; load evil-leader first so it's initialized for evil-mode
-    (global-evil-leader-mode)
-    (evil-leader/set-leader ","))
+      (use-package evil-matchit
+	:config
+	(global-evil-matchit-mode 1))
 
-  (use-package evil
-    :config
-    (evil-mode t)
-    (setq evil-move-cursor-back nil)
-    ;; set initial evil state for particular modes
-    (cl-loop for (mode . state) in '((cider-test-report-mode . emacs)
-                                     (dired-mode             . normal)
-                                     (magit-mode             . normal)
-                                     (magit-status-mode      . emacs)
-                                     (magit-diff-mode        . normal)
-                                     (magit-log-mode         . normal)
-                                     (magit-process-mode     . normal)
-                                     (magit-popup-mode       . emacs)
-                                     ;; this allows vi-mode in shells
-                                     (term-mode              . emacs))
-             do (evil-set-initial-state mode state)))
+      (use-package evil-commentary
+	:config
+	(evil-commentary-mode))
 
-  (use-package evil-matchit
-    :config
-    (global-evil-matchit-mode 1))
+      (use-package evil-surround
+	:config
+	(global-evil-surround-mode 1)
+	;; use non-spaced pairs when surrounding with an opening brace
+	(evil-add-to-alist
+	 'evil-surround-pairs-alist
+	 ?\( '("(" . ")")
+	 ?\[ '("[" . "]")
+	 ?\{ '("{" . "}")
+	 ?\) '("( " . " )")
+	 ?\] '("[ " . " ]")
+	 ?\} '("{ " . " }")))
 
-  (use-package evil-nerd-commenter
-    :defer t
-    :config
-    (evilnc-default-hotkeys))
+      (use-package evil-visualstar
+	:config
+	(global-evil-visualstar-mode))
 
-  (use-package evil-surround
-    :config
-    (global-evil-surround-mode 1)
-    ;; use non-spaced pairs when surrounding with an opening brace
-    (evil-add-to-alist
-     'evil-surround-pairs-alist
-     ?\( '("(" . ")")
-     ?\[ '("[" . "]")
-     ?\{ '("{" . "}")
-     ?\) '("( " . " )")
-     ?\] '("[ " . " ]")
-     ?\} '("{ " . " }")))
-
-  (use-package evil-visualstar
-    :config
-    (global-evil-visualstar-mode))
-
-  (use-package evil-search-highlight-persist
-    :config
-    (global-evil-search-highlight-persist t))
-#+END_SRC
+      (use-package evil-search-highlight-persist
+	:config
+	(global-evil-search-highlight-persist t))
+    #+END_SRC
 
 *** ripgrep
 
@@ -813,19 +810,18 @@ I like to have an indicator of what lines changed. =diff-hl= does a pretty good 
 #+END_SRC
 
 ** Escape evil
-Learning Emacs is way easier when ESC acts like it does in vim
-
-#+BEGIN_SRC emacs-lisp
-  (defun cs-minibuffer-keyboard-quit ()
-    "Abort recursive edit.
-  In Delete Selection mode, if the mark is active, just deactivate it;
-  then it takes a second \\[keyboard-quit] to abort the minibuffer."
-    (interactive)
-    (if (and delete-selection-mode transient-mark-mode mark-active)
-        (setq deactivate-mark  t)
-      (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-      (abort-recursive-edit)))
-#+END_SRC
+   Learning Emacs is way easier when ESC acts like it does in vim
+   #+BEGIN_SRC emacs-lisp
+     (defun cs-minibuffer-keyboard-quit ()
+       "Abort recursive edit.
+     In Delete Selection mode, if the mark is active, just deactivate it;
+     then it takes a second \\[keyboard-quit] to abort the minibuffer."
+       (interactive)
+       (if (and delete-selection-mode transient-mark-mode mark-active)
+	   (setq deactivate-mark  t)
+	 (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+	 (abort-recursive-edit)))
+   #+END_SRC
 * Show package load time
 
 Here's where we report how long it took to load all installed packages to the Messages buffer.
