@@ -53,52 +53,62 @@
 #+END_SRC
 
 * Package management
+  Let's use =use-package= for package loading because it's super nice.
 
-Let's use =use-package= for package loading because it's super nice.
+  First, we need to enable Emacs's built-in package manager and configure the package repositories:
+  #+BEGIN_SRC emacs-lisp
+    (require 'package)
+    (setq package-enable-at-startup nil)
+    (setq package-archives
+          '(("gnu"          . "https://elpa.gnu.org/packages/")
+            ("melpa"        . "https://melpa.org/packages/")
+            ("melpa-stable" . "https://stable.melpa.org/packages/")))
+  #+END_SRC
 
-First, we need to enable Emacs's built-in package manager and configure the package repositories:
-#+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (setq package-enable-at-startup nil)
-  (setq package-archives
-        '(("gnu"          . "https://elpa.gnu.org/packages/")
-          ("melpa"        . "https://melpa.org/packages/")
-          ("melpa-stable" . "https://stable.melpa.org/packages/")))
-#+END_SRC
+  Now that Emacs knows where to get =use-package=.
 
-Now that Emacs knows where to get =use-package=.
+  #+BEGIN_SRC emacs-lisp
+    (package-initialize)
 
-#+BEGIN_SRC emacs-lisp
-  (package-initialize)
+    (unless (package-installed-p 'use-package)
+      (package-refresh-contents)
+      (package-install 'use-package))
 
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
+    (eval-when-compile
+      (require 'use-package))
 
-  (eval-when-compile
-    (require 'use-package))
+    ;; always download all packages if not already downloaded
+    (setq use-package-always-ensure t)
+    ;; keep stats about packages
+    (setq use-package-compute-statistics t)
 
-  ;; always download all packages if not already downloaded
-  (setq use-package-always-ensure t)
-  ;; keep stats about packages
-  (setq use-package-compute-statistics t)
+    (use-package diminish) ; no longer included with use-package by default
 
-  (use-package diminish) ; no longer included with use-package by default
+    ;;; example use-package usage
+    ;; (use-package foo
+    ;;   :ensure t
+    ;;   :defer t
+    ;;   :if (display-graphic-p)
+    ;;   :commands (foo-all foo-super)
+    ;;   :mode "\\.mode\\'"
+    ;;   :diminish "f"
+    ;;   :init
+    ;;   (setq foo-variable t)
+    ;;   (evil-leader/set-key "fs" #'foo-super)
+    ;;   :config
+    ;;   (foo-mode 1))
+  #+END_SRC
 
-  ;;; example use-package usage
-  ;; (use-package foo
-  ;;   :ensure t
-  ;;   :defer t
-  ;;   :if (display-graphic-p)
-  ;;   :commands (foo-all foo-super)
-  ;;   :mode "\\.mode\\'"
-  ;;   :diminish "f"
-  ;;   :init
-  ;;   (setq foo-variable t)
-  ;;   (evil-leader/set-key "fs" #'foo-super)
-  ;;   :config
-  ;;   (foo-mode 1))
-#+END_SRC
+  Let's also setup automatic package updating:
+  #+BEGIN_SRC emacs-lisp
+    (use-package auto-package-update
+      :config
+      (setq auto-package-update-interval 14 ;; days
+            auto-package-update-prompt-before-update t
+            auto-package-update-delete-old-versions t
+            auto-package-update-hide-results t)
+      (auto-package-update-maybe))
+  #+END_SRC
 
 ** Package-specific configuration
 *** Emacs
@@ -620,9 +630,10 @@ Syntax checking / linting is super important for any text editor, so let's get o
 #+END_SRC
 
 ** UI niceties
-Break lines at word boundries instead of in the middle of words:
+Break lines at word boundries instead of in the middle of words, and show the column:
 #+BEGIN_SRC emacs-lisp
   (global-visual-line-mode 1)
+  (column-number-mode 1)
 #+END_SRC
 
 Disable the annoying bell:
