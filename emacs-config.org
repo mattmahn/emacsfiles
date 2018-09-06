@@ -333,15 +333,14 @@ C'mon, who doesn't like emoji!
 
 ** Environment merge
 
-There's an issue with Emacs on macOS where a command works in your shell, but not in Emacs. This ensures the enviroment variable inside Emacs are the same as your shell.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package exec-path-from-shell
-    :if (memq window-system '(mac ns x))
-    :ensure t
-    :config
-    (exec-path-from-shell-initialize))
-#+END_SRC
+   There's an issue with Emacs on macOS where a command works in your shell, but not in Emacs. This ensures the enviroment variable inside Emacs are the same as your shell.
+   #+BEGIN_SRC emacs-lisp
+     (use-package exec-path-from-shell
+       :if (memq window-system '(mac ns x))
+       :ensure t
+       :config
+       (exec-path-from-shell-initialize))
+   #+END_SRC
 
 ** Key binding discovery
 
