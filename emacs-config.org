@@ -774,52 +774,55 @@ Sometimes its fun to cycle through themes too.
     (evil-leader/set-key "ct" #'cycle-themes))
 #+END_SRC
 ** Version control
+   Magit is probably the best git tool integrated into an editor. Now I just have to learn it...
+   #+BEGIN_SRC emacs-lisp
+     (use-package magit
+       :ensure t
+       :defer t
+       :init
+       (evil-leader/set-key
+         "gg"  #'magit-dispatch-popup
+         "gs"  #'magit-status
+         "gd"  #'magit-diff-working-tree
+         "gco" #'magit-checkout
+         "gcb" #'magit-branch-and-checkout
+         "gl"  #'magit-pull-from-upstream
+         "gaa" #'magit-stage-modified
+         "gca" #'magit-commit
+         "gpu" #'magit-push-current-to-upstream
+         "gp"  #'magit-push-current-to-pushremote
+         "gt"  #'magit-tag)
+       ;; specific within magit-mode
+       (evil-leader/set-key-for-mode 'text-mode
+         "cc" 'with-editor-finish
+         "cC" 'with-editor-cancel)
+       :config
+       (setq truncate-lines nil) ; wrap lines
+       (define-key magit-status-mode-map (kbd "k") #'previous-line)
+       (define-key magit-status-mode-map (kbd "K") 'magit-discard)
+       (define-key magit-status-mode-map (kbd "j") #'next-line))
+   #+END_SRC
 
-Magit is probably the best git tool integrated into an editor. Now I just have to learn it...
+   Let's get a list of ~TODOs~ in the Magit buffer.  This requires =ripgrep=, =git grep= with PCRE support, or GNU =grep= with PCRE support.
+   #+BEGIN_SRC emacs-lisp
+     (use-package magit-todos
+       :after (magit))
+   #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :ensure t
-    :defer t
-    :init
-    (evil-leader/set-key
-      "gg"  #'magit-dispatch-popup
-      "gs"  #'magit-status
-      "gd"  #'magit-diff-working-tree
-      "gco" #'magit-checkout
-      "gcb" #'magit-branch-and-checkout
-      "gl"  #'magit-pull-from-upstream
-      "gaa" #'magit-stage-modified
-      "gca" #'magit-commit
-      "gpu" #'magit-push-current-to-upstream
-      "gp"  #'magit-push-current-to-pushremote
-      "gt"  #'magit-tag)
-    ;; specific within magit-mode
-    (evil-leader/set-key-for-mode 'text-mode
-      "cc" 'with-editor-finish
-      "cC" 'with-editor-cancel)
-    :config
-    (setq truncate-lines nil) ; wrap lines
-    (define-key magit-status-mode-map (kbd "k") #'previous-line)
-    (define-key magit-status-mode-map (kbd "K") 'magit-discard)
-    (define-key magit-status-mode-map (kbd "j") #'next-line))
-#+END_SRC
-
-I like to have an indicator of what lines changed. =diff-hl= does a pretty good job, but doesn't play too nice with Flycheck.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package diff-hl
-    :ensure t
-    :defer t
-    :init
-    (add-hook 'after-init-hook 'global-diff-hl-mode)
-    (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-    :config
-    (if (display-graphic-p)
-	(diff-hl-flydiff-mode t)
-      (diff-hl-margin-mode t)))
-#+END_SRC
+   I like to have an indicator of what lines changed. =diff-hl= does a pretty good job, but doesn't play too nice with Flycheck.
+   #+BEGIN_SRC emacs-lisp
+     (use-package diff-hl
+       :ensure t
+       :defer t
+       :init
+       (add-hook 'after-init-hook 'global-diff-hl-mode)
+       (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+       (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+       :config
+       (if (display-graphic-p)
+           (diff-hl-flydiff-mode t)
+         (diff-hl-margin-mode t)))
+   #+END_SRC
 
 ** Command aliases
 
