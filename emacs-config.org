@@ -392,6 +392,18 @@ Sometimes remembering all the key bindings is really hard...
     :mode "Dockerfile\\'")
 #+END_SRC
 
+*** Go
+    Get the basic Go mode:
+    #+BEGIN_SRC emacs-lisp
+      (use-package go-mode
+        :mode ("\\.go\\'"))
+    #+END_SRC
+    Use an LSP for fancier Go things; =go get -u github.com/sourcegraph/go-langserver= is needed to install the language server.
+    #+BEGIN_SRC emacs-lisp
+      (use-package lsp-go
+        :config
+        (add-hook 'go-mode-hook #'lsp-go-enable))
+    #+END_SRC
 *** JavaScript
     The LSP client for JavaScript/TypeScript needs to be intlled via npm before you can use it: =npm install -g javascript-typescript-langserver=.
     #+BEGIN_SRC emacs-lisp
