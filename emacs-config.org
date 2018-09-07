@@ -232,6 +232,7 @@ Maybe I'll actually use it unlike vim's NerdTree.
     :init
     (setq projectile-require-project-root nil
 	  projectile-completion-system 'ivy)
+    :config
     (setq projectile-globally-ignored-directories
 	  (cl-union projectile-globally-ignored-directories
 		    '(".git"
@@ -248,7 +249,6 @@ Maybe I'll actually use it unlike vim's NerdTree.
 		      "*.svg"
 		      "*.tgz"
 		      "*.zip")))
-    :config
     (projectile-mode 1))
 #+END_SRC
 
