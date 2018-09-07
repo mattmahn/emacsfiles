@@ -231,24 +231,24 @@ Maybe I'll actually use it unlike vim's NerdTree.
     :diminish projectile-mode
     :init
     (setq projectile-require-project-root nil
-          projectile-completion-system 'ivy)
-    :config
+	  projectile-completion-system 'ivy)
     (setq projectile-globally-ignored-directories
-          (cl-union projectile-globally-ignored-directories
-                    '(".git"
-                      "node_modules"
-                      "venv")))
+	  (cl-union projectile-globally-ignored-directories
+		    '(".git"
+		      "node_modules"
+		      "venv")))
     (setq projectile-globally-ignored-files
-          (cl-union projectile-globally-ignored-files
-                    '(".DS_Store"
-                      "*.gz"
-                      "*.pyc"
-                      "*.png"
-                      "*.jpg"
-                      "*.jar"
-                      "*.svg"
-                      "*.tgz"
-                      "*.zip")))
+	  (cl-union projectile-globally-ignored-files
+		    '(".DS_Store"
+		      "*.gz"
+		      "*.pyc"
+		      "*.png"
+		      "*.jpg"
+		      "*.jar"
+		      "*.svg"
+		      "*.tgz"
+		      "*.zip")))
+    :config
     (projectile-mode 1))
 #+END_SRC
 
@@ -265,18 +265,19 @@ Aggressively indent lines because it is (generally) more intuitive.
 #+END_SRC
 
 *** Ivy
-Ivy is "an interactive interface for completion in Emacs."
-#+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :pin melpa-stable
-    :config
-    (setq ivy-use-virtual-buffers t
-          ivy-count-format "(%d/%d) ")
-    (ivy-mode 1))
-#+END_SRC
-** Auto-completion
-
-=company-mode= seems to be the defacto tool, so I'll start with that.
+    Ivy is "an interactive interface for completion in Emacs."
+    #+BEGIN_SRC emacs-lisp
+      (use-package ivy
+	:pin melpa-stable
+	:init
+	(setq ivy-use-virtual-buffers t
+	      ivy-count-format "(%d/%d) ")
+	;; set completion style (http://oremacs.com/swiper/#completion-styles)
+	(setq ivy-re-builders-alist
+	      '((t . ivy--regex-fuzzy)))
+	:config
+	(ivy-mode 1))
+    #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
