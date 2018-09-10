@@ -396,7 +396,9 @@ Sometimes remembering all the key bindings is really hard...
     Get the basic Go mode:
     #+BEGIN_SRC emacs-lisp
       (use-package go-mode
-        :mode ("\\.go\\'"))
+        :mode ("\\.go\\'")
+        :config
+        (add-hook 'before-save-hook #'gofmt-before-save))
     #+END_SRC
     Use an LSP for fancier Go things; =go get -u github.com/sourcegraph/go-langserver= is needed to install the language server.
     #+BEGIN_SRC emacs-lisp
