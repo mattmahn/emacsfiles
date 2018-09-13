@@ -278,15 +278,15 @@ Aggressively indent lines because it is (generally) more intuitive.
     Ivy is "an interactive interface for completion in Emacs."
     #+BEGIN_SRC emacs-lisp
       (use-package ivy
-	:pin melpa-stable
-	:init
-	(setq ivy-use-virtual-buffers t
-	      ivy-count-format "(%d/%d) ")
-	;; set completion style (http://oremacs.com/swiper/#completion-styles)
-	(setq ivy-re-builders-alist
-	      '((t . ivy--regex-fuzzy)))
-	:config
-	(ivy-mode 1))
+        :pin melpa-stable
+        :init
+        (setq ivy-use-virtual-buffers t
+              ivy-count-format "(%d/%d) ")
+        ;; set completion style (http://oremacs.com/swiper/#completion-styles)
+        ;; (setq ivy-re-builders-alist
+        ;; 	'((t . ivy--regex-fuzzy)))
+        :config
+        (ivy-mode 1))
     #+END_SRC
 
 ** Auto-completion
