@@ -231,6 +231,26 @@ Because auto-enforced consistence is lovely.
   ;; set the default tab width (where I'd expec that to be configured)
   (setq default-tab-width 4)
 #+END_SRC
+
+*** Ivy
+    Ivy is "an interactive interface for completion in Emacs."
+    #+BEGIN_SRC emacs-lisp
+      (use-package ivy
+        :pin melpa-stable
+        :diminish ivy-mode
+        :init
+        (setq ivy-use-virtual-buffers t
+              ivy-count-format "(%d/%d) ")
+        ;; set completion style (http://oremacs.com/swiper/#completion-styles)
+        (setq ivy-re-builders-alist
+              '((t . ivy--regex-ignore-order)))
+        :config
+        (ivy-mode 1))
+
+      (use-package swiper)
+
+      (use-package counsel)
+    #+END_SRC
 *** projectile
 I need a nice project mangement tool, =projectile= will be that.
 Maybe I'll actually use it unlike vim's NerdTree.
@@ -262,7 +282,7 @@ Maybe I'll actually use it unlike vim's NerdTree.
     (projectile-mode 1))
 
   (use-package counsel-projectile
-    :defer t)
+    :after (counsel projectile))
 #+END_SRC
 
 *** aggressive indentation
@@ -276,25 +296,6 @@ Aggressively indent lines because it is (generally) more intuitive.
     (global-aggressive-indent-mode t)
     (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
 #+END_SRC
-
-*** Ivy
-    Ivy is "an interactive interface for completion in Emacs."
-    #+BEGIN_SRC emacs-lisp
-      (use-package ivy
-        :pin melpa-stable
-        :diminish ivy-mode
-        :init
-        (setq ivy-use-virtual-buffers t
-              ivy-count-format "(%d/%d) ")
-        ;; set completion style (http://oremacs.com/swiper/#completion-styles)
-        (setq ivy-re-builders-alist
-              '((t . ivy--regex-ignore-order)))
-        :config
-        (ivy-mode 1))
-
-      (use-package counsel
-        :defer t)
-    #+END_SRC
 
 ** Auto-completion
    =company-mode= seems to be the defacto tool, so I'll start with that.
