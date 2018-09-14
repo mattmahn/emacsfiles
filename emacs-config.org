@@ -241,25 +241,28 @@ Maybe I'll actually use it unlike vim's NerdTree.
     :diminish projectile-mode
     :init
     (setq projectile-require-project-root nil
-	  projectile-completion-system 'ivy)
+          projectile-completion-system 'ivy)
     :config
     (setq projectile-globally-ignored-directories
-	  (cl-union projectile-globally-ignored-directories
-		    '(".git"
-		      "node_modules"
-		      "venv")))
+          (cl-union projectile-globally-ignored-directories
+                    '(".git"
+                      "node_modules"
+                      "venv")))
     (setq projectile-globally-ignored-files
-	  (cl-union projectile-globally-ignored-files
-		    '(".DS_Store"
-		      "*.gz"
-		      "*.pyc"
-		      "*.png"
-		      "*.jpg"
-		      "*.jar"
-		      "*.svg"
-		      "*.tgz"
-		      "*.zip")))
+          (cl-union projectile-globally-ignored-files
+                    '(".DS_Store"
+                      "*.gz"
+                      "*.pyc"
+                      "*.png"
+                      "*.jpg"
+                      "*.jar"
+                      "*.svg"
+                      "*.tgz"
+                      "*.zip")))
     (projectile-mode 1))
+
+  (use-package counsel-projectile
+    :defer t)
 #+END_SRC
 
 *** aggressive indentation
@@ -279,14 +282,18 @@ Aggressively indent lines because it is (generally) more intuitive.
     #+BEGIN_SRC emacs-lisp
       (use-package ivy
         :pin melpa-stable
+        :diminish ivy-mode
         :init
         (setq ivy-use-virtual-buffers t
               ivy-count-format "(%d/%d) ")
         ;; set completion style (http://oremacs.com/swiper/#completion-styles)
-        ;; (setq ivy-re-builders-alist
-        ;; 	'((t . ivy--regex-fuzzy)))
+        (setq ivy-re-builders-alist
+              '((t . ivy--regex-ignore-order)))
         :config
         (ivy-mode 1))
+
+      (use-package counsel
+        :defer t)
     #+END_SRC
 
 ** Auto-completion
@@ -396,14 +403,13 @@ Sometimes remembering all the key bindings is really hard...
     Get the basic Go mode:
     #+BEGIN_SRC emacs-lisp
       (use-package go-mode
-        :mode ("\\.go\\'")
-        :config
+        :init
         (add-hook 'before-save-hook #'gofmt-before-save))
     #+END_SRC
     Use an LSP for fancier Go things; =go get -u github.com/sourcegraph/go-langserver= is needed to install the language server.
     #+BEGIN_SRC emacs-lisp
       (use-package lsp-go
-        :config
+        :init
         (add-hook 'go-mode-hook #'lsp-go-enable))
     #+END_SRC
 *** JavaScript
@@ -666,7 +672,7 @@ Match the titlebar color on macOS
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearande . dark))
   (setq ns-use-proxy-icon nil
-	frame-title-format nil)
+        frame-title-format nil)
 #+END_SRC
 
 I also need to turn off all those ugly bars.
@@ -686,11 +692,11 @@ I really don't understand why text editors don't have line numbers enabled by de
 
   (defun my/linum-get-format-string ()
     (let* ((width (1+ (length (number-to-string
-			       (count-lines (point-min) (point-max))))))
-	   (format (concat "%" (number-to-string width) "d")))
-      (setq my-linum-format-string format)))
+                               (count-lines (point-min) (point-max))))))
+           (format (concat "%" (number-to-string width) "d")))
+      (setq my/linum-format-string format)))
 
-  (defvar my/linum-current-line-number 0)
+  (defvar my/linum-current-line-number (line-number-at-pos))
 
   (setq linum-format 'my/linum-relative-line-numbers)
 
