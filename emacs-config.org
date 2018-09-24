@@ -5,6 +5,11 @@
   (setq user-full-name "Matthew Mahnke")
 #+END_SRC
 
+Avoid loading old bytecode instead of newer source.
+#+BEGIN_SRC emacs-lisp
+  (setq load-prefer-newer t)
+#+END_SRC
+
 * My functions
 
 #+BEGIN_SRC emacs-lisp
