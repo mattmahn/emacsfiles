@@ -102,6 +102,7 @@
   Let's also setup automatic package updating:
   #+BEGIN_SRC emacs-lisp
     (use-package auto-package-update
+      :ensure t
       :config
       (setq auto-package-update-interval 14 ;; days
             auto-package-update-prompt-before-update t
@@ -158,7 +159,6 @@ Save histories:
 
       (use-package evil
 	:config
-	(evil-mode t)
 	(setq evil-move-cursor-back nil)
 	;; set initial evil state for particular modes
 	(cl-loop for (mode . state) in '((cider-test-report-mode . emacs)
@@ -171,7 +171,8 @@ Save histories:
 					 (magit-popup-mode       . emacs)
 					 ;; this allows vi-mode in shells
 					 (term-mode              . emacs))
-		 do (evil-set-initial-state mode state)))
+		 do (evil-set-initial-state mode state))
+	(evil-mode +1))
 
       (use-package evil-matchit
 	:config
@@ -247,9 +248,13 @@ Because auto-enforced consistence is lovely.
         :config
         (ivy-mode 1))
 
-      (use-package swiper)
+      (use-package swiper
+        :pin melpa-stable
+        :after (ivy))
 
-      (use-package counsel)
+      (use-package counsel
+        :pin melpa-stable
+        :after (ivy))
     #+END_SRC
 *** projectile
 I need a nice project mangement tool, =projectile= will be that.
