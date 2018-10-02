@@ -12,50 +12,50 @@ Avoid loading old bytecode instead of newer source.
 
 * My functions
 
-#+BEGIN_SRC emacs-lisp
-  ;; default to UTF-8
-  (prefer-coding-system 'utf-8)
-  (set-language-environment "UTF-8")
-  (set-default-coding-systems 'utf-8)
-  (setq
-   ;; don't save customizations to init file
-   custom-file (concat user-emacs-directory ".emacs-customize.el")
-   ;; set spell check program to correct one
-   ispell-program-name "aspell"
-   require-final-newline t
-   )
+  #+BEGIN_SRC emacs-lisp
+    ;; default to UTF-8
+    (prefer-coding-system 'utf-8)
+    (set-language-environment "UTF-8")
+    (set-default-coding-systems 'utf-8)
+    (setq
+     ;; don't save customizations to init file
+     custom-file (concat user-emacs-directory ".emacs-customize.el")
+     ;; set spell check program to correct one
+     ispell-program-name "aspell"
+     require-final-newline t
+     )
 
-  ;; open URLs in default browser
-  (when (display-graphic-p)
-    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
-#+END_SRC
+    ;; open URLs in default browser
+    (when (display-graphic-p)
+      (setq browse-url-browser-function 'browse-url-default-macosx-browser))
+  #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (defun my/use-eslint-from-node-modules ()
-    "Programmatically change ‘flycheck-javscript-eslint-executable’ to use the local node_modules version before the globally installed version.
+  #+BEGIN_SRC emacs-lisp
+    (defun my/use-eslint-from-node-modules ()
+      "Programmatically change ‘flycheck-javscript-eslint-executable’ to use the local node_modules version before the globally installed version.
 
-  The directories are searched recursively up the the tree until a match is found."
-    (let ((root (locate-dominating-file
-                 (or (buffer-file-name) default-directory)
-                 (lambda (dir)
-                   (let ((eslint (expand-file-name "node_modules/.bin/eslint" dir)))
-                     (and eslint (file-executable-p eslint)))))))
-      (when root
-        (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
-          (setq-local flycheck-javascript-eslint-executable eslint)))))
-#+END_SRC
+    The directories are searched recursively up the the tree until a match is found."
+      (let ((root (locate-dominating-file
+                   (or (buffer-file-name) default-directory)
+                   (lambda (dir)
+                     (let ((eslint (expand-file-name "node_modules/.bin/eslint" dir)))
+                       (and eslint (file-executable-p eslint)))))))
+        (when root
+          (let ((eslint (expand-file-name "node_modules/eslint/bin/eslint.js" root)))
+            (setq-local flycheck-javascript-eslint-executable eslint)))))
+  #+END_SRC
 
 * Track Emacs load time
 
-#+BEGIN_SRC emacs-lisp
-  (defconst emacs-start-time (current-time))
-#+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (defconst emacs-start-time (current-time))
+  #+END_SRC
 
 * Garbage Collection
 
-#+BEGIN_SRC emacs-lisp
-  (setq gc-cons-threshold 20000000) ; 20MB
-#+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (setq gc-cons-threshold 20000000) ; 20MB
+  #+END_SRC
 
 * Package management
   Let's use =use-package= for package loading because it's super nice.
@@ -118,125 +118,120 @@ Avoid loading old bytecode instead of newer source.
 
 ** Package-specific configuration
 *** Emacs
+    Sometimes it is necessary to restart Emacs from within Emacs.
+    This makes it as easy as =M-x restart-emacs=.
 
-Sometimes it is necessary to restart Emacs from within Emacs.
-This makes it as easy as =M-x restart-emacs=.
+    #+BEGIN_SRC emacs-lisp
+      (use-package restart-emacs
+        :defer t)
+    #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-(use-package restart-emacs
-  :defer t)
-#+END_SRC
+    It's also nice to have Emacs running in daemon mode, so it starts faster in subsequent invocations:
+    #+BEGIN_SRC emacs-lisp
+      (use-package server
+        :ensure t
+        :if window-system
+        :init
+        (setq server-name "Matt's super secret Emacs server")
+        :config
+        (unless (server-running-p)
+          (add-hook 'after-init-hook 'server-start t)))
+    #+END_SRC
 
-It's also nice to have Emacs running in daemon mode, so it starts faster in subsequent invocations:
-#+BEGIN_SRC emacs-lisp
-  (use-package server
-    :ensure t
-    :if window-system
-    :init
-    (setq server-name "Matt's super secret Emacs server")
-    :config
-    (unless (server-running-p)
-      (add-hook 'after-init-hook 'server-start t)))
-#+END_SRC
+    Auto-pair parentheses and such:
+    #+BEGIN_SRC emacs-lisp
+      (electric-pair-mode 1)
+    #+END_SRC
 
-Auto-pair parentheses and such:
-#+BEGIN_SRC emacs-lisp
-  (electric-pair-mode 1)
-#+END_SRC
-
-Save histories:
-#+BEGIN_SRC emacs-lisp
-  (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
-        savehist-file "~/.emacs.d/savehist")
-  (savehist-mode 1)
-#+END_SRC
+    Save histories:
+    #+BEGIN_SRC emacs-lisp
+      (setq savehist-additional-variables '(kill-ring search-ring regexp-search-ring)
+            savehist-file "~/.emacs.d/savehist")
+      (savehist-mode 1)
+    #+END_SRC
 
 *** evil-mode
     Emacs's editing sucks. Vim's modal editing is the best.
     #+BEGIN_SRC emacs-lisp
       (use-package evil-leader
-	:init
-	(setq evil-leader/in-all-states t)
-	:config
-	;; load evil-leader first so it's initialized for evil-mode
-	(global-evil-leader-mode)
-	(evil-leader/set-leader ","))
+        :init
+        (setq evil-leader/in-all-states t)
+        :config
+        ;; load evil-leader first so it's initialized for evil-mode
+        (global-evil-leader-mode)
+        (evil-leader/set-leader ","))
 
       (use-package evil
-	:config
-	(setq evil-move-cursor-back nil)
-	;; set initial evil state for particular modes
-	(cl-loop for (mode . state) in '((cider-test-report-mode . emacs)
-					 (dired-mode             . normal)
-					 (magit-mode             . normal)
-					 (magit-status-mode      . emacs)
-					 (magit-diff-mode        . normal)
-					 (magit-log-mode         . normal)
-					 (magit-process-mode     . normal)
-					 (magit-popup-mode       . emacs)
-					 ;; this allows vi-mode in shells
-					 (term-mode              . emacs))
-		 do (evil-set-initial-state mode state))
-	(evil-mode +1))
+        :config
+        (setq evil-move-cursor-back nil)
+        ;; set initial evil state for particular modes
+        (cl-loop for (mode . state) in '((cider-test-report-mode . emacs)
+                                         (dired-mode             . normal)
+                                         (magit-mode             . normal)
+                                         (magit-status-mode      . emacs)
+                                         (magit-diff-mode        . normal)
+                                         (magit-log-mode         . normal)
+                                         (magit-process-mode     . normal)
+                                         (magit-popup-mode       . emacs)
+                                         ;; this allows vi-mode in shells
+                                         (term-mode              . emacs))
+                 do (evil-set-initial-state mode state))
+        (evil-mode +1))
 
       (use-package evil-matchit
-	:config
-	(global-evil-matchit-mode 1))
+        :config
+        (global-evil-matchit-mode 1))
 
       (use-package evil-commentary
-	:config
-	(evil-commentary-mode))
+        :config
+        (evil-commentary-mode))
 
       (use-package evil-surround
-	:config
-	(global-evil-surround-mode 1)
-	;; use non-spaced pairs when surrounding with an opening brace
-	(evil-add-to-alist
-	 'evil-surround-pairs-alist
-	 ?\( '("(" . ")")
-	 ?\[ '("[" . "]")
-	 ?\{ '("{" . "}")
-	 ?\) '("( " . " )")
-	 ?\] '("[ " . " ]")
-	 ?\} '("{ " . " }")))
+        :config
+        (global-evil-surround-mode 1)
+        ;; use non-spaced pairs when surrounding with an opening brace
+        (evil-add-to-alist
+         'evil-surround-pairs-alist
+         ?\( '("(" . ")")
+         ?\[ '("[" . "]")
+         ?\{ '("{" . "}")
+         ?\) '("( " . " )")
+         ?\] '("[ " . " ]")
+         ?\} '("{ " . " }")))
 
       (use-package evil-visualstar
-	:config
-	(global-evil-visualstar-mode))
+        :config
+        (global-evil-visualstar-mode))
 
       (use-package evil-search-highlight-persist
-	:config
-	(global-evil-search-highlight-persist t))
+        :config
+        (global-evil-search-highlight-persist t))
     #+END_SRC
 
 *** ripgrep
-
-=ripgrep= is the best {grep,ag,ucg,pt,sift}-like tool in existence. Peiod.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package rg
-    :defer t)
-#+END_SRC
+    =ripgrep= is the best {grep,ag,ucg,pt,sift}-like tool in existence. Peiod.
+    #+BEGIN_SRC emacs-lisp
+      (use-package rg
+        :defer t)
+    #+END_SRC
 
 **** TODO figure out what I want re key bindings
 *** Editorconfig
+    Because auto-enforced consistence is lovely.
+    #+BEGIN_SRC emacs-lisp
+      (use-package editorconfig
+        :diminish "↹"
+        :init
+        (setq auto-mode-alist
+              (cl-union auto-mode-alist
+                        '(("\\.editorconfig\\'" . editorconfig-conf-mode)
+                          ("editorconfig\\'"  . editorconfig-conf-mode))))
+        :config
+        (editorconfig-mode 1))
 
-Because auto-enforced consistence is lovely.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package editorconfig
-    :diminish "↹"
-    :init
-    (setq auto-mode-alist
-          (cl-union auto-mode-alist
-                    '(("\\.editorconfig\\'" . editorconfig-conf-mode)
-                      ("\\editorconfig\\'"  . editorconfig-conf-mode))))
-    :config
-    (editorconfig-mode 1))
-
-  ;; set the default tab width (where I'd expec that to be configured)
-  (setq default-tab-width 4)
-#+END_SRC
+      ;; set the default tab width (where I'd expect that to be configured)
+      (setq default-tab-width 4)
+    #+END_SRC
 
 *** Ivy
     Ivy is "an interactive interface for completion in Emacs."
@@ -298,16 +293,14 @@ Because auto-enforced consistence is lovely.
     #+END_SRC
 
 *** aggressive indentation
-
-Aggressively indent lines because it is (generally) more intuitive.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package aggressive-indent
-    :diminish "⇉"
-    :config
-    (global-aggressive-indent-mode t)
-    (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
-#+END_SRC
+    Aggressively indent lines because it is (generally) more intuitive.
+    #+BEGIN_SRC emacs-lisp
+      (use-package aggressive-indent
+        :diminish "⇉"
+        :config
+        (global-aggressive-indent-mode t)
+        (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
+    #+END_SRC
 
 ** Auto-completion
    =company-mode= seems to be the defacto tool, so I'll start with that.
@@ -317,7 +310,7 @@ Aggressively indent lines because it is (generally) more intuitive.
        :init
        (add-hook 'after-init-hook 'global-company-mode)
        (setq company-idle-delay 0.5
-	     company-minimum-prefix-length 2)
+             company-minimum-prefix-length 2)
        :config
        (company-tng-configure-default))
    #+END_SRC
@@ -330,29 +323,26 @@ Aggressively indent lines because it is (generally) more intuitive.
    #+END_SRC
 
 ** Emoji
-
-C'mon, who doesn't like emoji!
-
-#+BEGIN_SRC emacs-lisp
-  (use-package emojify
-    :defer t
-    :init
-    (add-hook 'after-init-hook #'global-emojify-mode)
-    :config
-    (setq emojify-inhibit-major-modes
-          (cl-union emojify-inhibit-major-modes
-                    '(cider-mode
-                      cider-repl-mode
-                      cider-test-report-mode
-                      sql-mode
-                      term-mode
-                      web-mode
-                      yaml-mode))
-          emojify-prog-contexts "comments"))
-#+END_SRC
+   C'mon, who doesn't like emoji!
+   #+BEGIN_SRC emacs-lisp
+     (use-package emojify
+       :defer t
+       :init
+       (add-hook 'after-init-hook #'global-emojify-mode)
+       :config
+       (setq emojify-inhibit-major-modes
+             (cl-union emojify-inhibit-major-modes
+                       '(cider-mode
+                         cider-repl-mode
+                         cider-test-report-mode
+                         sql-mode
+                         term-mode
+                         web-mode
+                         yaml-mode))
+             emojify-prog-contexts "comments"))
+   #+END_SRC
 
 ** Environment merge
-
    There's an issue with Emacs on macOS where a command works in your shell, but not in Emacs. This ensures the enviroment variable inside Emacs are the same as your shell.
    #+BEGIN_SRC emacs-lisp
      (use-package exec-path-from-shell
@@ -363,14 +353,13 @@ C'mon, who doesn't like emoji!
    #+END_SRC
 
 ** Key binding discovery
-
-Sometimes remembering all the key bindings is really hard...
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :diminish which-key-mode
-    :config
-    (which-key-mode))
-#+END_SRC
+   Sometimes remembering all the key bindings is really hard...
+   #+BEGIN_SRC emacs-lisp
+     (use-package which-key
+       :diminish which-key-mode
+       :config
+       (which-key-mode))
+   #+END_SRC
 
 ** Language Server
    The Language Server Protocol is devleoped by Microsoft to provide more conventional IDE-like features to editors without needing to write a custom, complex backend.
@@ -398,27 +387,26 @@ Sometimes remembering all the key bindings is really hard...
        :init
        (push 'company-lsp company-backends)
        (setq company-lsp-async t
-	     company-lsp-cache-candidates 'auto
-	     company-lsp-enable-recompletion t))
+             company-lsp-cache-candidates 'auto
+             company-lsp-enable-recompletion t))
    #+END_SRC
 
 ** Language support
    TODO, because there's too many...
 
 *** Docker
-
-#+BEGIN_SRC emacs-lisp
-  (use-package dockerfile-mode
-    :mode "Dockerfile\\'")
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package dockerfile-mode
+        :mode "Dockerfile")
+    #+END_SRC
 
 *** Go
     Get the basic Go mode:
     #+BEGIN_SRC emacs-lisp
       (use-package go-mode
-	:mode "\\(\\.go\\|go.mod\\|go.sum\\)\\'"
-	:init
-	(add-hook 'before-save-hook #'gofmt-before-save))
+        :mode "\\(\\.go\\|go.mod\\|go.sum\\)\\'"
+        :init
+        (add-hook 'before-save-hook #'gofmt-before-save))
     #+END_SRC
     Use an LSP for fancier Go things; =go get -u github.com/sourcegraph/go-langserver= is needed to install the language server.
     #+BEGIN_SRC emacs-lisp
@@ -456,356 +444,343 @@ Sometimes remembering all the key bindings is really hard...
     #+END_SRC
 
 *** JSON
-
-#+BEGIN_SRC emacs-lisp
-  (use-package json-mode
-    :defer t)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package json-mode
+        :defer t)
+    #+END_SRC
 
 *** Lisps
-
-#+BEGIN_SRC emacs-lisp
-  (use-package emacs-lisp
-    :ensure nil
-    :defer t)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package emacs-lisp
+        :ensure nil
+        :defer t)
+    #+END_SRC
 
 *** Markdown
+    #+BEGIN_SRC emacs-lisp
+      (use-package markdown-mode
+        :commands (markdown-mode gfm-mode)
+        :mode ("\\.md\\'"
+               "\\.mkd\\'"
+               "\\.markdown\\'")
+        :init
+        (setq mardown-command "multimarkdown"))
+    #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (use-package markdown-mode
-    :commands (markdown-mode gfm-mode)
-    :mode ("\\.md\\'"
-           "\\.mkd\\'"
-           "\\.markdown\\'")
-    :init
-    (setq mardown-command "multimarkdown"))
-#+END_SRC
-
-To enable editing of code blocks in indirect buffers using =C-c '=:
-#+BEGIN_SRC emacs-lisp
-  (use-package edit-indirect)
-#+END_SRC
+    To enable editing of code blocks in indirect buffers using =C-c '=:
+    #+BEGIN_SRC emacs-lisp
+      (use-package edit-indirect)
+    #+END_SRC
 
 *** Org
+    #+BEGIN_SRC emacs-lisp
+      (use-package org-mode
+        :ensure nil
+        :defer t
+        :init
+        (setq org-insert-mode-line-in-empty-file t ; for .txt file compatibility
+              org-ellipsis "..."
+              org-startup-truncated nil ; wrap lines, don't truncate
+              org-src-fontify-natively t
+              org-src-tab-acts-natively t
+              org-src-window-setup 'current-window
+              org-M-RET-may-split-line '((default . nil)) ; prevent M-RET from splitting lines
+              )
+        ;; exporting
+        (setq org-export-with-smart-quotes t
+              org-html-postamble nil)
+        (add-hook 'org-mode-hook
+                  (lambda ()
+                    (require 'ox-md)
+                    (require 'ox-beamer)))
 
-#+BEGIN_SRC emacs-lisp
-  (use-package org-mode
-    :ensure nil
-    :defer t
-    :init
-    (setq org-insert-mode-line-in-empty-file t ; for .txt file compatibility
-          org-ellipsis "..."
-          org-startup-truncated nil ; wrap lines, don't truncate
-          org-src-fontify-natively t
-          org-src-tab-acts-natively t
-          org-src-window-setup 'current-window
-          org-M-RET-may-split-line '((default . nil)) ; prevent M-RET from splitting lines
-          )
-    ;; exporting
-    (setq org-export-with-smart-quotes t
-          org-html-postamble nil)
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (require 'ox-md)
-                (require 'ox-beamer)))
+        ;;; gtd settings
+        ;; (setq org-todo-keywords
+        ;;       '((sequence "TODO" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELLED")))
+        ;; (setq org-agenda-files '("~/Dropbox/org/"))
+        ;; (setq org-agenda-text-search-extra-files '(agenda-archives))
+        ;; (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
+        ;; (setq org-enforce-todo-dependencies t)
+        ;; (setq org-log-done (quote time))
+        ;; (setq org-log-redeadline (quote time))
+        ;; (setq org-log-reschedule (quote time))
 
-    ;;; gtd settings
-    ;; (setq org-todo-keywords
-    ;;       '((sequence "TODO" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELLED")))
-    ;; (setq org-agenda-files '("~/Dropbox/org/"))
-    ;; (setq org-agenda-text-search-extra-files '(agenda-archives))
-    ;; (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
-    ;; (setq org-enforce-todo-dependencies t)
-    ;; (setq org-log-done (quote time))
-    ;; (setq org-log-redeadline (quote time))
-    ;; (setq org-log-reschedule (quote time))
+        ;;; keybinds pre load
+        (evil-leader/set-key-for-mode 'org-mode
+          "es" 'org-edit-special
+          "ri" 'ielm)
+        (evil-leader/set-key-for-mode 'emacs-lisp-mode
+          "cc" 'org-edit-src-exit
+          "cC" 'org-edit-src-abort))
 
-    ;;; keybinds pre load
-    (evil-leader/set-key-for-mode 'org-mode
-      "es" 'org-edit-special
-      "ri" 'ielm)
-    (evil-leader/set-key-for-mode 'emacs-lisp-mode
-      "cc" 'org-edit-src-exit
-      "cC" 'org-edit-src-abort))
-
-  (use-package org-bullets
-    :defer t
-    :init
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (org-bullets-mode t))))
-#+END_SRC
+      (use-package org-bullets
+        :defer t
+        :init
+        (add-hook 'org-mode-hook
+                  (lambda ()
+                    (org-bullets-mode t))))
+    #+END_SRC
 *** Rust
+    #+BEGIN_SRC emacs-lisp
+      (use-package rust-mode
+        :mode "\\.rs\\'"
+        :init
+        (setq rust-format-on-save t))
 
-#+BEGIN_SRC emacs-lisp
-  (use-package rust-mode
-    :mode "\\.rs\\'"
-    :init
-    (setq rust-format-on-save t))
-
-  (use-package lsp-rust
-    :ensure t
-    :init
-    (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
-    (add-hook 'rust-mode-hook #'lsp-rust-enable))
-#+END_SRC
+      (use-package lsp-rust
+        :ensure t
+        :init
+        (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
+        (add-hook 'rust-mode-hook #'lsp-rust-enable))
+    #+END_SRC
 
 *** Stylesheets
+    #+BEGIN_SRC emacs-lisp
+      (use-package css-mode
+        :ensure nil
+        :mode "\\.css\\'")
 
-#+BEGIN_SRC emacs-lisp
-  (use-package css-mode
-    :ensure nil
-    :mode "\\.css\\'")
+      (use-package scss-mode
+        :mode ("\\.scss\\'"
+               "\\.sass\\'"))
 
-  (use-package scss-mode
-    :mode ("\\.scss\\'"
-           "\\.sass\\'"))
-
-  ;; color hex color codes and such
-  ;;(use-package rainbow-mode
-  ;;  :defer t
-  ;;  :diminish rainbow-mode
-  ;;  :init
-  ;;  (add-hook 'css-mode-hook 'rainbow-mode)
-  ;;  (add-hook 'scss-mode-hook 'rainbow-mode))
-#+END_SRC
+      ;; color hex color codes and such
+      ;;(use-package rainbow-mode
+      ;;  :defer t
+      ;;  :diminish rainbow-mode
+      ;;  :init
+      ;;  (add-hook 'css-mode-hook 'rainbow-mode)
+      ;;  (add-hook 'scss-mode-hook 'rainbow-mode))
+    #+END_SRC
 
 *** Terraform
-#+BEGIN_SRC emacs-lisp
-  (use-package terraform-mode)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package terraform-mode)
+    #+END_SRC
 *** TOML
-
-Gotta have TOML support for Rust! (and other things)
-#+BEGIN_SRC emacs-lisp
-  (use-package toml-mode
-    :defer t)
-#+END_SRC
+    Gotta have TOML support for Rust! (and other things)
+    #+BEGIN_SRC emacs-lisp
+      (use-package toml-mode
+        :defer t)
+    #+END_SRC
 
 *** Web
-
-I hear good things =web-mode=; let's play.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package web-mode
-    :mode ("\\.html\\'"
-           "\\.html\\.erb\\'"
-           "\\.php\\'"
-           "\\.jinja\\'"
-           "\\.j2\\'")
-    :init
-    ;; fix paren matching web-mode conflict for jinja-like templates
-    (add-hook
-     'web-mode-hook
-     (lambda ()
-       (setq-local electric-pair-inhibit-predicate
-                   (lambda (c)
-                     (if (char-equal c ?{) t (electric-pair-default-inhibit c))))))
-    :config
-    (setq web-mode-code-indent-offset 2
-          web-mode-css-indent-offset 2
-          web-mode-markup-indent-offset 2)
-    (evil-leader/set-key-for-mode 'web-mode
-      "fh" #'web-beautify-html))
-#+END_SRC
+    I hear good things =web-mode=; let's play.
+    #+BEGIN_SRC emacs-lisp
+      (use-package web-mode
+        :mode ("\\.html\\'"
+               "\\.html\\.erb\\'"
+               "\\.php\\'"
+               "\\.jinja\\'"
+               "\\.j2\\'")
+        :init
+        ;; fix paren matching web-mode conflict for jinja-like templates
+        (add-hook
+         'web-mode-hook
+         (lambda ()
+           (setq-local electric-pair-inhibit-predicate
+                       (lambda (c)
+                         (if (char-equal c ?{) t (electric-pair-default-inhibit c))))))
+        :config
+        (setq web-mode-code-indent-offset 2
+              web-mode-css-indent-offset 2
+              web-mode-markup-indent-offset 2)
+        (evil-leader/set-key-for-mode 'web-mode
+          "fh" #'web-beautify-html))
+    #+END_SRC
 
 *** YAML
-
-#+BEGIN_SRC emacs-lisp
-  (use-package yaml-mode
-    :mode ("\\.yml\\'"
-           "\\.yaml\\'"))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package yaml-mode
+        :mode ("\\.yml\\'"
+               "\\.yaml\\'"))
+    #+END_SRC
 
 ** Spell check
-Let's turn on Flyspell when in a text major mode and for comments & strings when in programming mode:
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'text-mode 'flyspell-mode)
-  (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-#+END_SRC
+   Let's turn on Flyspell when in a text major mode and for comments & strings when in programming mode:
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'text-mode 'flyspell-mode)
+     (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+   #+END_SRC
 ** Syntax checking / Linting
-
-Syntax checking / linting is super important for any text editor, so let's get one.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :defer t
-    :diminish "✓"
-    ;:init
-    :config
-    (add-hook 'after-init-hook 'global-flycheck-mode)
-    ;; disable documentation related emacs lisp checker
-    (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed))
-    ;; disable JSHint because ESLint is better
-    (setq-default flycheck-disabled-checkers '(javascript-jshint))
-    ;; use the ESLint that's installed in node_modules before the global one
-    (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules))
-#+END_SRC
+   Syntax checking / linting is super important for any text editor, so let's get one.
+   #+BEGIN_SRC emacs-lisp
+     (use-package flycheck
+       :defer t
+       :diminish "✓"
+                                             ;:init
+       :config
+       (add-hook 'after-init-hook 'global-flycheck-mode)
+       ;; disable documentation related emacs lisp checker
+       (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed))
+       ;; disable JSHint because ESLint is better
+       (setq-default flycheck-disabled-checkers '(javascript-jshint))
+       ;; use the ESLint that's installed in node_modules before the global one
+       (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules))
+   #+END_SRC
 
 ** Terminal settings
-
-#+BEGIN_SRC emacs-lisp
-  (use-package multi-term
-    :defer t
-    :init
-    (setq multi-term-dedicated-window0height 30
-          multi-term-program "/usr/local/bin/zsh")
-    (add-hook 'term-mode-hook
-              (lambda ()
-                (setq term-buffer-maximum-size 10000
-                      yas-dont-activate t)
-                (setq-local scroll-margin 0
-                            scroll-conservatively 0
-                            scroll-step 1
-                            evil-emacs-state-cursor 'bar
-                            global-hl-line-mode nil))))
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (use-package multi-term
+       :defer t
+       :init
+       (setq multi-term-dedicated-window0height 30
+             multi-term-program "/usr/local/bin/zsh")
+       (add-hook 'term-mode-hook
+                 (lambda ()
+                   (setq term-buffer-maximum-size 10000
+                         yas-dont-activate t)
+                   (setq-local scroll-margin 0
+                               scroll-conservatively 0
+                               scroll-step 1
+                               evil-emacs-state-cursor 'bar
+                               global-hl-line-mode nil))))
+   #+END_SRC
 
 ** UI niceties
-Break lines at word boundries instead of in the middle of words, and show the column:
-#+BEGIN_SRC emacs-lisp
-  (global-visual-line-mode 1)
-  (column-number-mode 1)
-#+END_SRC
+   Break lines at word boundries instead of in the middle of words, and show the column:
+   #+BEGIN_SRC emacs-lisp
+     (global-visual-line-mode 1)
+     (column-number-mode 1)
+   #+END_SRC
 
-Disable the annoying bell:
-#+BEGIN_SRC emacs-lisp
-  (setq ring-bell-function 'ignore)
-#+END_SRC
+   Disable the annoying bell:
+   #+BEGIN_SRC emacs-lisp
+     (setq ring-bell-function 'ignore)
+   #+END_SRC
 
-What's the most important part about a user interface? The font!
-#+BEGIN_SRC emacs-lisp
-  (if (eq system-type 'darwin)
-      (add-to-list 'default-frame-alist '(font . "Iosevka-12"))
-    (add-to-list 'default-frame-alist '(font . "Iosevka-10:antialias=natural")))
-#+END_SRC
+   What's the most important part about a user interface? The font!
+   #+BEGIN_SRC emacs-lisp
+     (if (eq system-type 'darwin)
+         (add-to-list 'default-frame-alist '(font . "Iosevka-12"))
+       (add-to-list 'default-frame-alist '(font . "Iosevka-10:antialias=natural")))
+   #+END_SRC
 
-Match the titlebar color on macOS
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-  (add-to-list 'default-frame-alist '(ns-appearande . dark))
-  (setq ns-use-proxy-icon nil
-        frame-title-format nil)
-#+END_SRC
+   Match the titlebar color on macOS
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+     (add-to-list 'default-frame-alist '(ns-appearande . dark))
+     (setq ns-use-proxy-icon nil
+           frame-title-format nil)
+   #+END_SRC
 
-I also need to turn off all those ugly bars.
-#+BEGIN_SRC emacs-lisp
-  (menu-bar-mode 1)
-  (when (display-graphic-p)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1))
-#+END_SRC
+   I also need to turn off all those ugly bars.
+   #+BEGIN_SRC emacs-lisp
+     (menu-bar-mode 1)
+     (when (display-graphic-p)
+       (tool-bar-mode -1)
+       (scroll-bar-mode -1))
+   #+END_SRC
 
-I really don't understand why text editors don't have line numbers enabled by default... Let's turn them and relative numbers on:
-#+BEGIN_SRC emacs-lisp
-  ;; https://stackoverflow.com/a/6928112
-  (defvar my/linum-format-string "%3d")
+   I really don't understand why text editors don't have line numbers enabled by default... Let's turn them and relative numbers on:
+   #+BEGIN_SRC emacs-lisp
+     ;; https://stackoverflow.com/a/6928112
+     (defvar my/linum-format-string "%3d")
 
-  (add-hook 'linum-before-numbering-hook 'my/linum-get-format-string)
+     (add-hook 'linum-before-numbering-hook 'my/linum-get-format-string)
 
-  (defun my/linum-get-format-string ()
-    (let* ((width (1+ (length (number-to-string
-                               (count-lines (point-min) (point-max))))))
-           (format (concat "%" (number-to-string width) "d")))
-      (setq my/linum-format-string format)))
+     (defun my/linum-get-format-string ()
+       (let* ((width (1+ (length (number-to-string
+                                  (count-lines (point-min) (point-max))))))
+              (format (concat "%" (number-to-string width) "d")))
+         (setq my/linum-format-string format)))
 
-  (defvar my/linum-current-line-number (line-number-at-pos))
+     (defvar my/linum-current-line-number (line-number-at-pos))
 
-  (setq linum-format 'my/linum-relative-line-numbers)
+     (setq linum-format 'my/linum-relative-line-numbers)
 
-  (defun my/linum-relative-line-numbers (line-number)
-    (let ((offset (abs (- line-number my/linum-current-line-number))))
-      (propertize (format my/linum-format-string offset) 'face 'linum)))
+     (defun my/linum-relative-line-numbers (line-number)
+       (let ((offset (abs (- line-number my/linum-current-line-number))))
+         (propertize (format my/linum-format-string offset) 'face 'linum)))
 
-  (defadvice linum-update (around my-linum-update)
-    (let ((my/linum-current-line-number (line-number-at-pos)))
-      ad-do-it))
-  (ad-activate 'linum-update)
+     (defadvice linum-update (around my-linum-update)
+       (let ((my/linum-current-line-number (line-number-at-pos)))
+         ad-do-it))
+     (ad-activate 'linum-update)
 
-  (global-linum-mode +1)
-#+END_SRC
+     (global-linum-mode +1)
+   #+END_SRC
 
-Rainbow parenthesis are really nice to have, assuming it doesn't slow down your editor. They basically make it easy to spot matching parenthesis/braces/brackets.
-#+BEGIN_SRC emacs-lisp
-  (use-package highlight-parentheses
-    :ensure t
-    :defer t
-    :init
-    (add-hook 'prog-mode-hook #'highlight-parentheses-mode)
-    (setq hl-paren-colors '("Springgreen3" "IndianRed1" "IndianRed3" "IndianRed4")))
+   Rainbow parenthesis are really nice to have, assuming it doesn't slow down your editor. They basically make it easy to spot matching parenthesis/braces/brackets.
+   #+BEGIN_SRC emacs-lisp
+     (use-package highlight-parentheses
+       :ensure t
+       :defer t
+       :init
+       (add-hook 'prog-mode-hook #'highlight-parentheses-mode)
+       (setq hl-paren-colors '("Springgreen3" "IndianRed1" "IndianRed3" "IndianRed4")))
 
-  ;; highlight matching parenthesis
-  (setq
-   show-paren-style 'parenthesis
-   show-paren-delay 0)
-  (show-paren-mode t)
-#+END_SRC
+     ;; highlight matching parenthesis
+     (setq
+      show-paren-style 'parenthesis
+      show-paren-delay 0)
+     (show-paren-mode t)
+   #+END_SRC
 
-Miscellaneous:
-#+BEGIN_SRC emacs-lisp
-  (global-prettify-symbols-mode)
-  ;; highlight current line
-  (global-hl-line-mode)
-#+END_SRC
+   Miscellaneous:
+   #+BEGIN_SRC emacs-lisp
+     (global-prettify-symbols-mode)
+     ;; highlight current line
+     (global-hl-line-mode)
+   #+END_SRC
 
 *** Modeline
 
-First, lets declutter it:
+    First, lets declutter it:
 
-#+BEGIN_SRC emacs-lisp
-  (diminish 'auto-revert-mode "↺")
-  (diminish 'subword-mode)
-  (diminish 'undo-tree-mode)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (diminish 'auto-revert-mode "↺")
+      (diminish 'subword-mode)
+      (diminish 'undo-tree-mode)
+    #+END_SRC
 
-Eventually I'll put a custom mode-line confiuration here...
+    Eventually I'll put a custom mode-line confiuration here...
 
 *** Scrolling
 
-#+BEGIN_SRC emacs-lisp
-  ;;; smoother
-  (setq scroll-margin 8
-        scroll-conservatively 100
-        scroll-step 2
-        ;; slower on a trackpad
-        mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil))
-        mouse-wheel-progressive-speed nil)
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      ;;; smoother
+      (setq scroll-margin 8
+            scroll-conservatively 100
+            scroll-step 2
+            ;; slower on a trackpad
+            mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil))
+            mouse-wheel-progressive-speed nil)
+    #+END_SRC
 *** Themes
 
-#+BEGIN_SRC emacs-lisp
-  (use-package solarized-theme
-    :if (display-graphic-p)
-    :config
-    (load-theme 'solarized-dark t t)
-    (load-theme 'solarized-light t t))
+    #+BEGIN_SRC emacs-lisp
+      (use-package solarized-theme
+        :if (display-graphic-p)
+        :config
+        (load-theme 'solarized-dark t t)
+        (load-theme 'solarized-light t t))
 
-  (use-package ample-theme
-    :if (not (display-graphic-p))
-    :config
-    (load-theme 'ample-theme t t)
-    (load-theme 'ample-flat-theme t t))
+      (use-package ample-theme
+        :if (not (display-graphic-p))
+        :config
+        (load-theme 'ample-theme t t)
+        (load-theme 'ample-flat-theme t t))
 
-  (use-package spacemacs-theme
-    :defer t
-    :init
-    (load-theme 'spacemacs-dark t nil)
-    (load-theme 'spacemacs-light t t))
-#+END_SRC
+      (use-package spacemacs-theme
+        :defer t
+        :init
+        (load-theme 'spacemacs-dark t nil)
+        (load-theme 'spacemacs-light t t))
+    #+END_SRC
 
-Sometimes its fun to cycle through themes too.
+    Sometimes its fun to cycle through themes too.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package cycle-themes
-    :if (display-graphic-p)
-    :init
-    (setq cycle-themes-theme-list
-          '(solarized-dark
-            solarized-light))
-    :config
-    (evil-leader/set-key "ct" #'cycle-themes))
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package cycle-themes
+        :if (display-graphic-p)
+        :init
+        (setq cycle-themes-theme-list
+              '(solarized-dark
+                solarized-light))
+        :config
+        (evil-leader/set-key "ct" #'cycle-themes))
+    #+END_SRC
 ** Version control
    Magit is probably the best git tool integrated into an editor. Now I just have to learn it...
    #+BEGIN_SRC emacs-lisp
@@ -858,10 +833,9 @@ Sometimes its fun to cycle through themes too.
    #+END_SRC
 
 ** Command aliases
-
-#+BEGIN_SRC emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
+   #+BEGIN_SRC emacs-lisp
+     (defalias 'yes-or-no-p 'y-or-n-p)
+   #+END_SRC
 
 ** Escape evil
    Learning Emacs is way easier when ESC acts like it does in vim
@@ -872,17 +846,15 @@ Sometimes its fun to cycle through themes too.
      then it takes a second \\[keyboard-quit] to abort the minibuffer."
        (interactive)
        (if (and delete-selection-mode transient-mark-mode mark-active)
-	   (setq deactivate-mark  t)
-	 (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
-	 (abort-recursive-edit)))
+           (setq deactivate-mark  t)
+         (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+         (abort-recursive-edit)))
    #+END_SRC
 * Show package load time
-
-Here's where we report how long it took to load all installed packages to the Messages buffer.
-
-#+BEGIN_SRC emacs-lisp
-  ;;; show package load time
-  (let ((elapsed (float-time (time-subtract (current-time)
-                                            emacs-start-time))))
-    (message "Loaded packages in %.3fs" elapsed))
-#+END_SRC
+  Here's where we report how long it took to load all installed packages to the Messages buffer.
+  #+BEGIN_SRC emacs-lisp
+    ;;; show package load time
+    (let ((elapsed (float-time (time-subtract (current-time)
+                                              emacs-start-time))))
+      (message "Loaded packages in %.3fs" elapsed))
+  #+END_SRC
