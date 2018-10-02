@@ -265,33 +265,36 @@ Because auto-enforced consistence is lovely.
     I need a nice project mangement tool, =projectile= will be that.
     #+BEGIN_SRC emacs-lisp
       (use-package projectile
-	:ensure t
-	:pin melpa-stable
-	:diminish projectile-mode
-	:init
-	(setq projectile-require-project-root nil
-	      projectile-completion-system 'ivy)
-	:config
-	(setq projectile-globally-ignored-directories
-	      (cl-union projectile-globally-ignored-directories
-			'(".git"
-			  "node_modules"
-			  "venv")))
-	(setq projectile-globally-ignored-files
-	      (cl-union projectile-globally-ignored-files
-			'(".DS_Store"
-			  "*.gz"
-			  "*.pyc"
-			  "*.png"
-			  "*.jpg"
-			  "*.jar"
-			  "*.svg"
-			  "*.tgz"
-			  "*.zip")))
-	(projectile-mode 1))
+        :ensure t
+        :pin melpa-stable
+        :diminish projectile-mode
+        :init
+        (setq projectile-require-project-root nil
+              projectile-completion-system 'ivy)
+        :config
+        (setq projectile-globally-ignored-directories
+              (cl-union projectile-globally-ignored-directories
+                        '(".git"
+                          "node_modules"
+                          "venv")))
+        (setq projectile-globally-ignored-files
+              (cl-union projectile-globally-ignored-files
+                        '(".DS_Store"
+                          "*.gz"
+                          "*.pyc"
+                          "*.png"
+                          "*.jpg"
+                          "*.jar"
+                          "*.svg"
+                          "*.tgz"
+                          "*.zip")))
+        (setq projectile-project-root-files
+              (cl-union projectile-project-root-files
+                        '("go.mod")))
+        (projectile-mode 1))
 
       (use-package counsel-projectile
-	:after (counsel projectile))
+        :after (counsel projectile))
     #+END_SRC
 
 *** aggressive indentation
