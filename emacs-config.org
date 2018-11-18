@@ -20,8 +20,6 @@ Avoid loading old bytecode instead of newer source.
     (setq
      ;; don't save customizations to init file
      custom-file (concat user-emacs-directory ".emacs-customize.el")
-     ;; set spell check program to correct one
-     ispell-program-name "aspell"
      require-final-newline t
      )
 
@@ -208,14 +206,6 @@ Avoid loading old bytecode instead of newer source.
         (global-evil-search-highlight-persist t))
     #+END_SRC
 
-*** ripgrep
-    =ripgrep= is the best {grep,ag,ucg,pt,sift}-like tool in existence. Peiod.
-    #+BEGIN_SRC emacs-lisp
-      (use-package rg
-        :defer t)
-    #+END_SRC
-
-**** TODO figure out what I want re key bindings
 *** Editorconfig
     Because auto-enforced consistence is lovely.
     #+BEGIN_SRC emacs-lisp
@@ -260,36 +250,33 @@ Avoid loading old bytecode instead of newer source.
     I need a nice project mangement tool, =projectile= will be that.
     #+BEGIN_SRC emacs-lisp
       (use-package projectile
-        :ensure t
-        :pin melpa-stable
-        :diminish projectile-mode
-        :init
-        (setq projectile-require-project-root nil
-              projectile-completion-system 'ivy)
-        :config
-        (setq projectile-globally-ignored-directories
-              (cl-union projectile-globally-ignored-directories
-                        '(".git"
-                          "node_modules"
-                          "venv")))
-        (setq projectile-globally-ignored-files
-              (cl-union projectile-globally-ignored-files
-                        '(".DS_Store"
-                          "*.gz"
-                          "*.pyc"
-                          "*.png"
-                          "*.jpg"
-                          "*.jar"
-                          "*.svg"
-                          "*.tgz"
-                          "*.zip")))
-        (setq projectile-project-root-files
-              (cl-union projectile-project-root-files
-                        '("go.mod")))
-        (projectile-mode 1))
-
-      (use-package counsel-projectile
-        :after (counsel projectile))
+	:ensure t
+	;; :pin melpa-stable
+	:diminish projectile-mode
+	:init
+	(setq projectile-require-project-root nil
+	      projectile-completion-system 'ivy)
+	:config
+	(setq projectile-globally-ignored-directories
+	      (cl-union projectile-globally-ignored-directories
+			'(".git"
+			  "node_modules"
+			  "venv")))
+	(setq projectile-globally-ignored-files
+	      (cl-union projectile-globally-ignored-files
+			'(".DS_Store"
+			  "*.gz"
+			  "*.pyc"
+			  "*.png"
+			  "*.jpg"
+			  "*.jar"
+			  "*.svg"
+			  "*.tgz"
+			  "*.zip")))
+	(setq projectile-project-root-files
+	      (cl-union projectile-project-root-files
+			'("go.mod")))
+	(projectile-mode +1))
     #+END_SRC
 
 *** aggressive indentation
@@ -602,6 +589,7 @@ Avoid loading old bytecode instead of newer source.
      (add-hook 'text-mode 'flyspell-mode)
      (add-hook 'prog-mode-hook 'flyspell-prog-mode)
    #+END_SRC
+   See [[https://www.gnu.org/software/emacs/manual/html_node/efaq-w32/Spell-check.html]] for setting the spell-check program.
 ** Syntax checking / Linting
    Syntax checking / linting is super important for any text editor, so let's get one.
    #+BEGIN_SRC emacs-lisp
