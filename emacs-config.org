@@ -462,50 +462,48 @@ Avoid loading old bytecode instead of newer source.
 *** Org
     #+BEGIN_SRC emacs-lisp
       (use-package org-mode
-        :ensure nil
-        :defer t
-        :init
-        (setq org-insert-mode-line-in-empty-file t ; for .txt file compatibility
-              org-ellipsis "..."
-              org-startup-truncated nil ; wrap lines, don't truncate
-              org-src-fontify-natively t
-              org-src-tab-acts-natively t
-              org-src-window-setup 'current-window
-              org-M-RET-may-split-line '((default . nil)) ; prevent M-RET from splitting lines
-              )
-        ;; exporting
-        (setq org-export-with-smart-quotes t
-              org-html-postamble nil)
-        (add-hook 'org-mode-hook
-                  (lambda ()
-                    (require 'ox-md)
-                    (require 'ox-beamer)))
+	:ensure nil
+	:defer t
+	:init
+	(setq org-insert-mode-line-in-empty-file t ; for .txt file compatibility
+	      org-ellipsis "..."
+	      org-startup-truncated nil ; wrap lines, don't truncate
+	      org-src-fontify-natively t
+	      org-src-tab-acts-natively t
+	      org-src-window-setup 'current-window
+	      org-M-RET-may-split-line '((default . nil)) ; prevent M-RET from splitting lines
+	      )
+	;; exporting
+	(setq org-export-with-smart-quotes t
+	      org-html-postamble nil)
+	(add-hook 'org-mode-hook
+		  (lambda ()
+		    (require 'ox-md)
+		    (require 'ox-beamer)))
 
-        ;;; gtd settings
-        ;; (setq org-todo-keywords
-        ;;       '((sequence "TODO" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELLED")))
-        ;; (setq org-agenda-files '("~/Dropbox/org/"))
-        ;; (setq org-agenda-text-search-extra-files '(agenda-archives))
-        ;; (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
-        ;; (setq org-enforce-todo-dependencies t)
-        ;; (setq org-log-done (quote time))
-        ;; (setq org-log-redeadline (quote time))
-        ;; (setq org-log-reschedule (quote time))
+	;;; gtd settings
+	;; (setq org-todo-keywords
+	;;       '((sequence "TODO" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELLED")))
+	;; (setq org-agenda-files '("~/Dropbox/org/"))
+	;; (setq org-agenda-text-search-extra-files '(agenda-archives))
+	;; (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
+	;; (setq org-enforce-todo-dependencies t)
+	;; (setq org-log-done (quote time))
+	;; (setq org-log-redeadline (quote time))
+	;; (setq org-log-reschedule (quote time))
 
-        ;;; keybinds pre load
-        (evil-leader/set-key-for-mode 'org-mode
-          "es" 'org-edit-special
-          "ri" 'ielm)
-        (evil-leader/set-key-for-mode 'emacs-lisp-mode
-          "cc" 'org-edit-src-exit
-          "cC" 'org-edit-src-abort))
+	;;; keybinds pre load
+	(evil-leader/set-key-for-mode 'org-mode
+	  "es" 'org-edit-special
+	  "ri" 'ielm)
+	(evil-leader/set-key-for-mode 'emacs-lisp-mode
+	  "cc" 'org-edit-src-exit
+	  "cC" 'org-edit-src-abort))
 
       (use-package org-bullets
-        :defer t
-        :init
-        (add-hook 'org-mode-hook
-                  (lambda ()
-                    (org-bullets-mode t))))
+	:hook org-mode
+	:init
+	(setq inhibit-compacting-font-caches t))
     #+END_SRC
 *** Rust
     #+BEGIN_SRC emacs-lisp
