@@ -539,6 +539,11 @@ Avoid loading old bytecode instead of newer source.
       ;;  (add-hook 'scss-mode-hook 'rainbow-mode))
     #+END_SRC
 
+*** Systemd
+    #+BEGIN_SRC emacs-lisp
+      (use-package systemd)
+    #+END_SRC
+
 *** Terraform
     #+BEGIN_SRC emacs-lisp
       (use-package terraform-mode)
