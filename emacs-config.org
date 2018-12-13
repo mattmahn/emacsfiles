@@ -161,6 +161,7 @@ Avoid loading old bytecode instead of newer source.
 
       (use-package evil
         :config
+        (modify-syntax-entry ?_ "w") ; include _ as word character
         (setq evil-move-cursor-back nil)
         ;; set initial evil state for particular modes
         (cl-loop for (mode . state) in '((cider-test-report-mode . emacs)
@@ -204,6 +205,26 @@ Avoid loading old bytecode instead of newer source.
       (use-package evil-search-highlight-persist
         :config
         (global-evil-search-highlight-persist t))
+
+      (use-package evil-numbers)
+    #+END_SRC
+
+    I tend to highligh blocks and repeatedly change its indentation, so I'll make Emacs re-highlight the visual selection:
+    #+BEGIN_SRC emacs-lisp
+      (defun my/evil-shift-left-visual ()
+        (interactive)
+        (evil-shift-left (region-beginning) (region-end))
+        (evil-normal-state)
+        (evil-visual-restore))
+
+      (defun my/evil-shift-right-visual ()
+        (interactive)
+        (evil-shift-right (region-beginning) (region-end))
+        (evil-normal-state)
+        (evil-visual-restore))
+
+      (define-key evil-visual-state-map (kbd "<") 'my/evil-shift-left-visual)
+      (define-key evil-visual-state-map (kbd ">") 'my/evil-shift-right-visual)
     #+END_SRC
 
 *** Editorconfig
