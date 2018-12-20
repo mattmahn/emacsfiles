@@ -795,7 +795,7 @@ Avoid loading old bytecode instead of newer source.
         (evil-leader/set-key "ct" #'cycle-themes))
     #+END_SRC
 ** Version control
-   Magit is probably the best git tool integrated into an editor. Now I just have to learn it...
+   [[https://magit.vc][Magit]] is probably the best git tool integrated into an editor. Now I just have to learn it...
    #+BEGIN_SRC emacs-lisp
      (use-package magit
        :ensure t
@@ -822,6 +822,14 @@ Avoid loading old bytecode instead of newer source.
        (define-key magit-status-mode-map (kbd "k") #'previous-line)
        (define-key magit-status-mode-map (kbd "K") 'magit-discard)
        (define-key magit-status-mode-map (kbd "j") #'next-line))
+   #+END_SRC
+
+   There's also a project called [[https://magit.vc/manual/forge/index.html][Forge]], also developed by the Magit maintainer, that provides nice integrations with GitHub, GitLab, etc.
+   #+BEGIN_SRC emacs-lisp
+     (use-package forge
+       :disabled ; wait for repo release
+       :after (magit)
+       :requires (magit))
    #+END_SRC
 
    Let's get a list of ~TODOs~ in the Magit buffer.  This requires =ripgrep=, =git grep= with PCRE support, or GNU =grep= with PCRE support.
