@@ -23,5 +23,7 @@
   New-Item -Path "$PATH_FROM_ABOVE" -ItemType SymbolicLink -Value "$HOME\.emacsfiles\emacs.el"
    #+END_SRC
 
+   Then run =M-x all-the-icons-install-fonts= to install fonts for the modeline (and other things?).
+
 ** Used In
   - [[https://github.com/mattmahn/dotfiles][mattmahn/dotfiles]]

@@ -724,9 +724,8 @@ Avoid loading old bytecode instead of newer source.
    #+BEGIN_SRC emacs-lisp
      (use-package highlight-parentheses
        :ensure t
-       :defer t
+       :hook (prog-mode . highlight-parentheses-mode)
        :init
-       (add-hook 'prog-mode-hook #'highlight-parentheses-mode)
        (setq hl-paren-colors '("Springgreen3" "IndianRed1" "IndianRed3" "IndianRed4")))
 
      ;; highlight matching parenthesis
@@ -743,6 +742,13 @@ Avoid loading old bytecode instead of newer source.
      (global-hl-line-mode)
    #+END_SRC
 
+*** Icons
+    #+BEGIN_SRC emacs-lisp
+      (use-package all-the-icons
+	:ensure t)
+    #+END_SRC
+    After loading this, run =M-x all-the-icons-install-fonts= to install fonts to the operating system.
+
 *** Modeline
 
     First, lets declutter it:
@@ -754,6 +760,11 @@ Avoid loading old bytecode instead of newer source.
     #+END_SRC
 
     Eventually I'll put a custom mode-line confiuration here...
+    #+BEGIN_SRC emacs-lisp
+      (use-package doom-modeline
+	:ensure t
+	:hook (after-init . doom-modeline-init))
+    #+END_SRC
 
 *** Scrolling
 
