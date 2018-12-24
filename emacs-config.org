@@ -621,7 +621,6 @@ Avoid loading old bytecode instead of newer source.
      (use-package flycheck
        :defer t
        :diminish "✓"
-                                             ;:init
        :config
        (add-hook 'after-init-hook 'global-flycheck-mode)
        ;; disable documentation related emacs lisp checker
@@ -630,6 +629,13 @@ Avoid loading old bytecode instead of newer source.
        (setq-default flycheck-disabled-checkers '(javascript-jshint))
        ;; use the ESLint that's installed in node_modules before the global one
        (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules))
+   #+END_SRC
+
+   Display Flycheck errors in-line with the file contents:
+   #+BEGIN_SRC emacs-lisp
+     (use-package flycheck-inline
+       :requires (flycheck)
+       :hook (flycheck-mode . turn-on-flycheck-inline))
    #+END_SRC
 
 ** Terminal settings
