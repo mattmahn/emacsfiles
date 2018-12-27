@@ -611,24 +611,24 @@ Avoid loading old bytecode instead of newer source.
 ** Spell check
    Let's turn on Flyspell when in a text major mode and for comments & strings when in programming mode:
    #+BEGIN_SRC emacs-lisp
-     (add-hook 'text-mode 'flyspell-mode)
-     (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+     (add-hook 'text-mode-hook #'flyspell-mode)
+     (add-hook 'prog-mode-hook #'flyspell-prog-mode)
    #+END_SRC
    See [[https://www.gnu.org/software/emacs/manual/html_node/efaq-w32/Spell-check.html]] for setting the spell-check program.
 ** Syntax checking / Linting
    Syntax checking / linting is super important for any text editor, so let's get one.
    #+BEGIN_SRC emacs-lisp
      (use-package flycheck
-       :defer t
        :diminish "✓"
+       :hook (after-init-hook . global-flycheck-mode)
+       :init
+       ;; use the ESLint that's installed in node_modules before the global one
+       (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
        :config
-       (add-hook 'after-init-hook 'global-flycheck-mode)
        ;; disable documentation related emacs lisp checker
        (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc clojure-cider-typed))
        ;; disable JSHint because ESLint is better
-       (setq-default flycheck-disabled-checkers '(javascript-jshint))
-       ;; use the ESLint that's installed in node_modules before the global one
-       (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules))
+       (setq-default flycheck-disabled-checkers '(javascript-jshint)))
    #+END_SRC
 
    Display Flycheck errors in-line with the file contents:
@@ -643,7 +643,7 @@ Avoid loading old bytecode instead of newer source.
      (use-package multi-term
        :defer t
        :init
-       (setq multi-term-dedicated-window0height 30
+       (setq multi-term-dedicated-window-height 30
              multi-term-program "/usr/local/bin/zsh")
        (add-hook 'term-mode-hook
                  (lambda ()
