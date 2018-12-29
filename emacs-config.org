@@ -403,6 +403,12 @@ Avoid loading old bytecode instead of newer source.
 ** Language support
    TODO, because there's too many...
 
+   =orgpop= is a nifty little package that can extract code comment blocks into a temporary buffer for editing, like Org's =org-edit-src-code=.
+   #+BEGIN_SRC emacs-lisp
+     (use-package poporg
+       :bind ("C-c \"" . poporg-dwim))
+   #+END_SRC
+
 *** Docker
     #+BEGIN_SRC emacs-lisp
       (use-package dockerfile-mode
