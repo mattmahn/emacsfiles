@@ -377,22 +377,21 @@ Avoid loading old bytecode instead of newer source.
    #+BEGIN_SRC emacs-lisp
      (use-package lsp-mode
        :ensure t
-       :pin melpa-stable
        :init
        ;; make sure we have lsp-imenu everywhere we have LSP
-       (require 'lsp-imenu)
        (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable))
 
      (use-package lsp-ui
        :ensure t
+       :hook (lsp-mode . lsp-ui-mode)
        :init
-       (setq lsp-ui-sideline-ignore-duplicate t)
-       (add-hook 'lsp-mode-hook #'lsp-ui-mode))
+       (setq lsp-ui-sideline-ignore-duplicate t))
    #+END_SRC
 
    You can also use =company-mode= with LSP:
    #+BEGIN_SRC emacs-lisp
      (use-package company-lsp
+       :after (lsp-mode)
        :init
        (push 'company-lsp company-backends)
        (setq company-lsp-async t
@@ -420,14 +419,13 @@ Avoid loading old bytecode instead of newer source.
     #+BEGIN_SRC emacs-lisp
       (use-package go-mode
         :mode "\\(\\.go\\|go.mod\\|go.sum\\)\\'"
-        :init
-        (add-hook 'before-save-hook #'gofmt-before-save))
+        :hook ((before-save . gofmt-before-save)))
     #+END_SRC
     Use an LSP for fancier Go things; =go get -u github.com/sourcegraph/go-langserver= is needed to install the language server.
     #+BEGIN_SRC emacs-lisp
       (use-package lsp-go
-        :init
-        (add-hook 'go-mode-hook #'lsp-go-enable))
+        :after (lsp-mode)
+        :hook (go-mode . lsp-go-enable))
     #+END_SRC
 *** JavaScript
     The LSP client for JavaScript/TypeScript needs to be intlled via npm before you can use it: =npm install -g javascript-typescript-langserver=.
@@ -441,10 +439,8 @@ Avoid loading old bytecode instead of newer source.
                                              "msg.no.side.effects")))
 
       (use-package lsp-javascript-typescript
-        :ensure t
-        :config
-        (add-hook 'js2-mode-hook #'lsp-javascript-typescript-enable)
-        (add-hook 'typescript-mode-hook #'lsp-javascript-typescript-enable))
+        :after (lsp-mode)
+        :hook ((js2-mode typescript-mode) . lsp-javascript-typescript-enable))
 
       (use-package indium
         :defer t
@@ -536,10 +532,10 @@ Avoid loading old bytecode instead of newer source.
         (setq rust-format-on-save t))
 
       (use-package lsp-rust
-        :ensure t
+        :after (lsp-mode)
+        :hook (rust-mode . lsp-rust-enable)
         :init
-        (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls"))
-        (add-hook 'rust-mode-hook #'lsp-rust-enable))
+        (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls")))
     #+END_SRC
 
 *** Stylesheets
