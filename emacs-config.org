@@ -275,6 +275,7 @@ Avoid loading old bytecode instead of newer source.
         :ensure t
         :pin melpa-stable
         :diminish projectile-mode
+        :bind-keymap ("C-c p" . projectile-command-map)
         :init
         (setq projectile-require-project-root nil
               projectile-completion-system 'ivy)
