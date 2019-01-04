@@ -827,17 +827,18 @@ Avoid loading old bytecode instead of newer source.
    #+BEGIN_SRC emacs-lisp
      (use-package magit-todos
        :after (magit))
+
+     (use-package hl-todo
+       :config
+       (global-hl-todo-mode +1))
    #+END_SRC
 
    I like to have an indicator of what lines changed. =diff-hl= does a pretty good job, but doesn't play too nice with Flycheck.
    #+BEGIN_SRC emacs-lisp
      (use-package diff-hl
        :ensure t
-       :defer t
-       :init
-       (add-hook 'after-init-hook 'global-diff-hl-mode)
-       (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-       (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+       :hook ((after-init . global-diff-hl-mode)
+              (dired-mode . diff-hl-dir-mode))
        :config
        (if (display-graphic-p)
            (diff-hl-flydiff-mode t)
