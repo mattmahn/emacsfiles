@@ -658,9 +658,9 @@ Avoid loading old bytecode instead of newer source.
 
    What's the most important part about a user interface? The font!
    #+BEGIN_SRC emacs-lisp
-     (if (eq system-type 'darwin)
-         (add-to-list 'default-frame-alist '(font . "Iosevka-12"))
-       (add-to-list 'default-frame-alist '(font . "Iosevka-10:antialias=natural")))
+     (pcase system-type
+       ('darwin (add-to-list 'default-frame-alist '(font . "Iosevka-12")))
+       (_       (add-to-list 'default-frame-alist '(font . "Iosevka-10:antialias=natural"))))
    #+END_SRC
 
    Match the titlebar color on macOS
