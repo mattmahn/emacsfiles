@@ -374,26 +374,30 @@ Avoid loading old bytecode instead of newer source.
 ** Language Server
    The Language Server Protocol is devleoped by Microsoft to provide more conventional IDE-like features to editors without needing to write a custom, complex backend.
    Instead, one only needs to write a client for the desired language's language server.
+   You can also use =company-mode= with LSP.
 
    #+BEGIN_SRC emacs-lisp
      (use-package lsp-mode
-       :ensure t
-       :init
-       ;; make sure we have lsp-imenu everywhere we have LSP
-       (add-hook 'prog-major-mode #'lsp-prog-major-mode-enable))
+       :commands lsp
+       :hook (prog-mode . lsp))
+
+     ;; TODO: make the window disappear/behave normally && hide line numbers
+     (defun my/hide-frame-line-numbers (frame _window)
+       "Hides line nunmbers from a specific frame in a winow."
+       (select-frame frame)
+       (display-line-numbers-mode -1))
 
      (use-package lsp-ui
-       :ensure t
+       :commands lsp-ui-mode
        :hook (lsp-mode . lsp-ui-mode)
-       :init
-       (setq lsp-ui-sideline-ignore-duplicate t))
-   #+END_SRC
+       :config
+       (setq lsp-ui-sideline-ignore-duplicate t)
+       ;; (add-hook 'lsp-ui-doc-frame-hook #'my/hide-frame-line-numbers)
+       )
 
-   You can also use =company-mode= with LSP:
-   #+BEGIN_SRC emacs-lisp
      (use-package company-lsp
-       :after (lsp-mode)
-       :init
+       :commands company-lsp
+       :config
        (push 'company-lsp company-backends)
        (setq company-lsp-async t
              company-lsp-cache-candidates 'auto
@@ -422,26 +426,18 @@ Avoid loading old bytecode instead of newer source.
         :mode "\\(\\.go\\|go.mod\\|go.sum\\)\\'"
         :hook ((before-save . gofmt-before-save)))
     #+END_SRC
-    Use an LSP for fancier Go things; =go get -u github.com/sourcegraph/go-langserver= is needed to install the language server.
-    #+BEGIN_SRC emacs-lisp
-      (use-package lsp-go
-        :after (lsp-mode)
-        :hook (go-mode . lsp-go-enable))
-    #+END_SRC
+    Use an LSP for fancier Go things; =go get -u github.com/saibing/bingo= is needed to install the language server.
 *** JavaScript
     The LSP client for JavaScript/TypeScript needs to be installed via npm before you can use it: =npm install -g javascript-typescript-langserver=.
     #+BEGIN_SRC emacs-lisp
       (use-package js2-mode
         :mode ("\\.js\\'"
                "\\.mjs\\'")
+        :hook ((js2-mode typescript-mode-hook) . lsp)
         :init
         (setq-default js2-ignored-warnings '("msg.extra.trailing.comma"
                                              "msg.missing.semi"
                                              "msg.no.side.effects")))
-
-      (use-package lsp-javascript-typescript
-        :after (lsp-mode)
-        :hook ((js2-mode typescript-mode) . lsp-javascript-typescript-enable))
 
       (use-package indium
         :defer t
@@ -531,12 +527,6 @@ Avoid loading old bytecode instead of newer source.
         :mode "\\.rs\\'"
         :init
         (setq rust-format-on-save t))
-
-      (use-package lsp-rust
-        :after (lsp-mode)
-        :hook (rust-mode . lsp-rust-enable)
-        :init
-        (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls")))
     #+END_SRC
 
 *** Stylesheets
