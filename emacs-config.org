@@ -302,6 +302,15 @@ Avoid loading old bytecode instead of newer source.
         (projectile-mode +1))
     #+END_SRC
 
+*** Smartparens
+    Do some magic with pairs!
+    #+BEGIN_SRC emacs-lisp
+      (use-package smartparens
+        :hook ((prog-mode-hook) . smartparens-mode)
+        :config
+        (require 'smartparens-config))
+    #+END_SRC
+
 *** aggressive indentation
     Aggressively indent lines because it is (generally) more intuitive.
     #+BEGIN_SRC emacs-lisp
