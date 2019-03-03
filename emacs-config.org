@@ -765,6 +765,10 @@ Avoid loading old bytecode instead of newer source.
         (load-theme 'ample-theme t t)
         (load-theme 'ample-flat-theme t t))
 
+      ;; (use-package nimbus-theme
+      ;;   :config
+      ;;   (load-theme 'nimbus t t))
+
       (use-package spacemacs-theme
         :defer t
         :init
