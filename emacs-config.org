@@ -57,7 +57,7 @@ Avoid loading old bytecode instead of newer source.
 
   Hide the backup files someplace special.
   #+BEGIN_SRC emacs-lisp
-    (seq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+    (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
          backup-by-copying t  ; don't delink hardlinks
          delete-old-versions t  ; automatically delete excess backups
          )
