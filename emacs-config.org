@@ -55,6 +55,14 @@ Avoid loading old bytecode instead of newer source.
     (setq gc-cons-threshold 20000000) ; 20MB
   #+END_SRC
 
+  Hide the backup files someplace special.
+  #+BEGIN_SRC emacs-lisp
+    (seq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+         backup-by-copying t  ; don't delink hardlinks
+         delete-old-versions t  ; automatically delete excess backups
+         )
+  #+END_SRC
+
 * Package management
   Let's use =use-package= for package loading because it's super nice.
 
@@ -187,16 +195,7 @@ Avoid loading old bytecode instead of newer source.
 
       (use-package evil-surround
         :config
-        (global-evil-surround-mode 1)
-        ;; use non-spaced pairs when surrounding with an opening brace
-        (evil-add-to-alist
-         'evil-surround-pairs-alist
-         ?\( '("(" . ")")
-         ?\[ '("[" . "]")
-         ?\{ '("{" . "}")
-         ?\) '("( " . " )")
-         ?\] '("[ " . " ]")
-         ?\} '("{ " . " }")))
+        (global-evil-surround-mode 1))
 
       (use-package evil-visualstar
         :config
@@ -330,6 +329,7 @@ Avoid loading old bytecode instead of newer source.
        (add-hook 'after-init-hook 'global-company-mode)
        (setq company-idle-delay 0.5
              company-minimum-prefix-length 2)
+       (setq completion-style '(partial-completion substring emacs22))
        :config
        (company-tng-configure-default))
    #+END_SRC
