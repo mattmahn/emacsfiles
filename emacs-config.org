@@ -317,7 +317,8 @@ Avoid loading old bytecode instead of newer source.
         :diminish "⇉"
         :config
         (global-aggressive-indent-mode t)
-        (add-to-list 'aggressive-indent-excluded-modes 'html-mode))
+        (add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+        (add-to-list 'aggressive-indent-excluded-modes 'python-mode))
     #+END_SRC
 
 ** Auto-completion
@@ -530,6 +531,11 @@ Avoid loading old bytecode instead of newer source.
           "cc" 'org-edit-src-exit
           "cC" 'org-edit-src-abort))
     #+END_SRC
+*** Python
+    Disable tabs in =python-mode=
+    #+BEGIN_SRC emacs-lisp
+      (add-hook 'python-mode-hook (lambda () (setq indent-tabs-mode nil)))
+    #+END_SRC
 *** Rust
     #+BEGIN_SRC emacs-lisp
       (use-package rust-mode
@@ -699,7 +705,8 @@ Avoid loading old bytecode instead of newer source.
        :ensure t
        :hook (prog-mode . highlight-parentheses-mode)
        :init
-       (setq hl-paren-colors '("Springgreen3" "IndianRed1" "IndianRed3" "IndianRed4")))
+       (setq hl-paren-colors ;'("Springgreen3" "IndianRed1" "IndianRed3" "IndianRed4")
+             '("IndianRed1" "DarkOrange1" "gold2" "Springgreen3" "blue2" "violet")))
 
      ;; highlight matching parenthesis
      (setq
@@ -765,14 +772,14 @@ Avoid loading old bytecode instead of newer source.
         (load-theme 'ample-theme t t)
         (load-theme 'ample-flat-theme t t))
 
-      ;; (use-package nimbus-theme
-      ;;   :config
-      ;;   (load-theme 'nimbus t t))
+      (use-package nimbus-theme
+        :config
+        (load-theme 'nimbus t nil))
 
       (use-package spacemacs-theme
         :defer t
         :init
-        (load-theme 'spacemacs-dark t nil)
+        (load-theme 'spacemacs-dark t t)
         (load-theme 'spacemacs-light t t))
     #+END_SRC
 
