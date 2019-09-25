@@ -136,7 +136,7 @@ Avoid loading old bytecode instead of newer source.
     #+BEGIN_SRC emacs-lisp
       (use-package server
         :ensure t
-        :if window-system
+        :if (display-graphic-p)
         :init
         (setq server-name "Matt's super secret Emacs server")
         :config
@@ -281,8 +281,7 @@ Avoid loading old bytecode instead of newer source.
         :config
         (setq projectile-globally-ignored-directories
               (cl-union projectile-globally-ignored-directories
-                        '(".git"
-                          "node_modules"
+                        '("node_modules"
                           "venv")))
         (setq projectile-globally-ignored-files
               (cl-union projectile-globally-ignored-files
