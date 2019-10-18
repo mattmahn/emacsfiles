@@ -569,8 +569,11 @@ Avoid loading old bytecode instead of newer source.
 
 *** Terraform
     #+BEGIN_SRC emacs-lisp
-      (use-package terraform-mode)
+      (use-package terraform-mode
+        :init
+        (add-hook 'terraform-mode-hook #'terraform-format-on-save-mode))
     #+END_SRC
+
 *** TOML
     Gotta have TOML support for Rust! (and other things)
     #+BEGIN_SRC emacs-lisp
