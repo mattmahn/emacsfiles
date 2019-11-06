@@ -802,7 +802,6 @@ Avoid loading old bytecode instead of newer source.
    #+BEGIN_SRC emacs-lisp
      (use-package magit
        :ensure t
-       :defer t
        :init
        (evil-leader/set-key
          "gg"  #'magit-dispatch-popup
@@ -823,7 +822,7 @@ Avoid loading old bytecode instead of newer source.
        :config
        (setq truncate-lines nil) ; wrap lines
        (define-key magit-status-mode-map (kbd "k") #'previous-line)
-       (define-key magit-status-mode-map (kbd "K") 'magit-discard)
+       (define-key magit-status-mode-map (kbd "K") #'magit-discard)
        (define-key magit-status-mode-map (kbd "j") #'next-line))
    #+END_SRC
 
@@ -856,6 +855,20 @@ Avoid loading old bytecode instead of newer source.
            (diff-hl-flydiff-mode t)
          (diff-hl-margin-mode t)))
    #+END_SRC
+
+*** YOLO
+    Let's emulate my ~git yolo~ alias in Magit: it simply uses a commit message
+    from [[http:whatthecommit.com/index.txt][whatthecommit]] as the commit message.
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'load-path (expand-file-name "~/.emacsfiles"))
+      (autoload 'my/yolo-commit "yolo")
+      (autoload 'my/yolo-commit-editor "yolo")
+
+      (transient-append-suffix 'magit-commit "c"
+        '("y" "YOLO" my/yolo-commit-editor))
+      (transient-append-suffix 'magit-commit "y"
+        '("Y" "YOLO harder" my/yolo-commit))
+    #+END_SRC
 
 ** Command aliases
    Replace "yes/no" prompts with "y/n" because the other's simply too many letters:
