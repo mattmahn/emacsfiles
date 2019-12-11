@@ -814,7 +814,8 @@ Avoid loading old bytecode instead of newer source.
    Let's get a list of ~TODOs~ in the Magit buffer.  This requires =ripgrep=, =git grep= with PCRE support, or GNU =grep= with PCRE support.
    #+BEGIN_SRC emacs-lisp
      (use-package magit-todos
-       :after (magit))
+       :requires (magit)
+       :hook (magit-mode . magit-todos-mode))
 
      (use-package hl-todo
        :config
