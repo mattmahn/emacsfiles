@@ -760,43 +760,20 @@ Avoid loading old bytecode instead of newer source.
             mouse-wheel-progressive-speed nil)
     #+END_SRC
 *** Themes
-
     #+BEGIN_SRC emacs-lisp
-      (use-package solarized-theme
-        :if (display-graphic-p)
-        :config
-        (load-theme 'solarized-dark t t)
-        (load-theme 'solarized-light t t))
-
       (use-package ample-theme
-        :if (not (display-graphic-p))
-        :config
-        (load-theme 'ample-theme t t)
-        (load-theme 'ample-flat-theme t t))
-
-      (use-package nimbus-theme
-        :config
-        (load-theme 'nimbus t nil))
-
-      (use-package spacemacs-theme
         :defer t
+        :ensure t
         :init
-        (load-theme 'spacemacs-dark t t)
-        (load-theme 'spacemacs-light t t))
+        (load-theme 'ample t t)
+        (load-theme 'ample-flat t t)
+        (load-theme 'ample-light t t))
+      (use-package nimbus-theme)
+      (use-package solarized-theme)
+
+      (enable-theme 'ample)
     #+END_SRC
 
-    Sometimes its fun to cycle through themes too.
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package cycle-themes
-        :if (display-graphic-p)
-        :init
-        (setq cycle-themes-theme-list
-              '(solarized-dark
-                solarized-light))
-        :config
-        (evil-leader/set-key "ct" #'cycle-themes))
-    #+END_SRC
 ** Version control
    [[https://magit.vc][Magit]] is probably the best git tool integrated into an editor. Now I just have to learn it...
    #+BEGIN_SRC emacs-lisp
