@@ -293,6 +293,14 @@ Avoid loading old bytecode instead of newer source.
         (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
     #+END_SRC
 
+    Let's make Ivy fancy.
+    #+BEGIN_SRC emacs-lisp
+      (use-package ivy-rich
+        :after (ivy)
+        :init
+        (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+        :config
+        (ivy-rich-mode +1))
     #+END_SRC
 
 *** projectile
