@@ -47,10 +47,8 @@ Avoid loading old bytecode instead of newer source.
   #+BEGIN_SRC emacs-lisp
     (defmacro my/many-global-set-key (key-alist)
       "Evaluates `global-set-key' with the alist KEY-ALIST."
-      `(cl-loop for pair in ,key-alist
-                for key = (kbd (car pair))
-                for command = (cdr pair)
-                do (global-set-key key command)))
+      `(cl-loop for (key . command) in ,key-alist
+                do (global-set-key (kbd key) command)))
   #+END_SRC
 
 * Track Emacs load time
@@ -281,15 +279,12 @@ Avoid loading old bytecode instead of newer source.
         :after (ivy)
         :config
         (counsel-mode +1)
-        (my/many-global-set-key '(("C-c C-r" . 'ivy-resume)
-                                  ("<f6>" . 'ivy-resume)
-                                  ;; ("<f1> l" . 'counsel-find-library)
-                                  ;; ("<f2> i" . 'counsel-info-lookup-symbol)
-                                  ("<f2> u" . 'counsel-unicode-char)
-                                  ("C-c g" . 'counsel-git)
-                                  ("C-c j" . 'counsel-git-grep)
-                                  ("C-c k" . 'counsel-rg)
-                                  ))
+        (my/many-global-set-key '(("C-c C-r" . ivy-resume)
+                                  ("<f6>"    . ivy-resume)
+                                  ("<f2> u"  . counsel-unicode-char)
+                                  ("C-c g"   . counsel-git)
+                                  ("C-c j"   . counsel-git-grep)
+                                  ("C-c k"   . counsel-rg)))
         (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
     #+END_SRC
 
