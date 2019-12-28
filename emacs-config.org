@@ -852,7 +852,10 @@ Avoid loading old bytecode instead of newer source.
    #+BEGIN_SRC emacs-lisp
      (use-package magit-todos
        :requires (magit)
-       :hook (magit-mode . magit-todos-mode))
+       :hook (magit-mode . magit-todos-mode)
+       :init
+       (unless (executable-find "nice") ; don't break Magit on systems that don't have `nice'
+         (setq magit-todos-nice nil)))
 
      (use-package hl-todo
        :config
