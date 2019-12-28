@@ -485,6 +485,7 @@ Avoid loading old bytecode instead of newer source.
                                              "msg.no.side.effects")))
 
       (use-package indium
+        :disabled
         :defer t
         :init
         (add-hook 'js2-mode-hook (lambda ()
