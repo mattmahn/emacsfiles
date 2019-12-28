@@ -43,6 +43,16 @@ Avoid loading old bytecode instead of newer source.
             (setq-local flycheck-javascript-eslint-executable eslint)))))
   #+END_SRC
 
+  Let's make a macro that calls =global-set-key= over an alist:
+  #+BEGIN_SRC emacs-lisp
+    (defmacro my/many-global-set-key (key-alist)
+      "Evaluates `global-set-key' with the alist KEY-ALIST."
+      `(cl-loop for pair in ,key-alist
+                for key = (kbd (car pair))
+                for command = (cdr pair)
+                do (global-set-key key command)))
+  #+END_SRC
+
 * Track Emacs load time
 
   #+BEGIN_SRC emacs-lisp
@@ -250,21 +260,39 @@ Avoid loading old bytecode instead of newer source.
         :pin melpa-stable
         :diminish ivy-mode
         :init
-        (setq ivy-use-virtual-buffers t
+        (setq enable-recursive-minibuffers t
+              ivy-use-selectable-prompt t
+              ivy-use-virtual-buffers t
               ivy-count-format "(%d/%d) ")
         ;; set completion style (http://oremacs.com/swiper/#completion-styles)
         (setq ivy-re-builders-alist
               '((t . ivy--regex-ignore-order)))
         :config
-        (ivy-mode 1))
+        (ivy-mode +1))
 
       (use-package swiper
         :pin melpa-stable
-        :after (ivy))
+        :after (ivy)
+        :config
+        (global-set-key "\C-s" 'swiper))
 
       (use-package counsel
         :pin melpa-stable
-        :after (ivy))
+        :after (ivy)
+        :config
+        (counsel-mode +1)
+        (my/many-global-set-key '(("C-c C-r" . 'ivy-resume)
+                                  ("<f6>" . 'ivy-resume)
+                                  ;; ("<f1> l" . 'counsel-find-library)
+                                  ;; ("<f2> i" . 'counsel-info-lookup-symbol)
+                                  ("<f2> u" . 'counsel-unicode-char)
+                                  ("C-c g" . 'counsel-git)
+                                  ("C-c j" . 'counsel-git-grep)
+                                  ("C-c k" . 'counsel-rg)
+                                  ))
+        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+    #+END_SRC
+
     #+END_SRC
 
 *** projectile
