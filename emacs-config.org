@@ -838,7 +838,7 @@ Avoid loading old bytecode instead of newer source.
    There's also a project called [[https://magit.vc/manual/forge/index.html][Forge]], also developed by the Magit maintainer, that provides nice integrations with GitHub, GitLab, etc.
    #+BEGIN_SRC emacs-lisp
      (use-package forge
-       :disabled ; wait for repo release
+       :disabled				; wait for repo release
        :after (magit)
        :requires (magit))
    #+END_SRC
