@@ -418,8 +418,8 @@ Avoid loading old bytecode instead of newer source.
 
    #+BEGIN_SRC emacs-lisp
      (use-package lsp-mode
-       :commands lsp
-       :hook (prog-mode . lsp))
+       :commands (lsp lsp-deferred)
+       :hook (prog-mode . lsp-deferred))
 
      ;; TODO: make the window disappear/behave normally && hide line numbers
      (defun my/hide-frame-line-numbers (frame _window)
@@ -428,12 +428,17 @@ Avoid loading old bytecode instead of newer source.
        (display-line-numbers-mode -1))
 
      (use-package lsp-ui
+       :requires (lsp-mode)
        :commands lsp-ui-mode
        :hook (lsp-mode . lsp-ui-mode)
        :config
        (setq lsp-ui-sideline-ignore-duplicate t)
        ;; (add-hook 'lsp-ui-doc-frame-hook #'my/hide-frame-line-numbers)
        )
+
+     (use-package lsp-ivy
+       :requires (lsp-mode)
+       :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol))
 
      (use-package company-lsp
        :commands company-lsp
