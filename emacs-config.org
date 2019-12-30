@@ -130,6 +130,14 @@ Avoid loading old bytecode instead of newer source.
       (auto-package-update-maybe))
   #+END_SRC
 
+  Let's also add a way to ensure certain system packages are installed alongside
+  Emacs packages.  This is useful when, for example, you need the =rg=
+  executable, or an npm package.
+  #+BEGIN_SRC emacs-lisp
+    (use-package use-package-ensure-system-package
+      :ensure t)
+  #+END_SRC
+
 ** Package-specific configuration
 *** Emacs
     Sometimes it is necessary to restart Emacs from within Emacs.
@@ -468,14 +476,17 @@ Avoid loading old bytecode instead of newer source.
     Get the basic Go mode:
     #+BEGIN_SRC emacs-lisp
       (use-package go-mode
+        :ensure-system-package (gopls . "GO111MODULE=on go get golang.org/x/tools/gopls@latest")
         :mode "\\(\\.go\\|go.mod\\|go.sum\\)\\'"
         :hook ((before-save . gofmt-before-save)))
     #+END_SRC
-    Use an LSP for fancier Go things; =go get -u github.com/saibing/bingo= is needed to install the language server.
+
 *** JavaScript
     The LSP client for JavaScript/TypeScript needs to be installed via npm before you can use it: =npm install -g javascript-typescript-langserver=.
     #+BEGIN_SRC emacs-lisp
       (use-package js2-mode
+        :ensure-system-package ((typescript . "npm i -g typescript")
+                                (typescript-language-server . "npm i -g typescript-language-server"))
         :mode ("\\.js\\'"
                "\\.mjs\\'")
         :hook ((js2-mode typescript-mode-hook) . lsp)
@@ -500,6 +511,7 @@ Avoid loading old bytecode instead of newer source.
 *** JSON
     #+BEGIN_SRC emacs-lisp
       (use-package json-mode
+        :ensure-system-package (vscode-json-languageserver . "npm i -g vscode-json-languageserver")
         :defer t)
     #+END_SRC
 
@@ -567,14 +579,21 @@ Avoid loading old bytecode instead of newer source.
           "cc" 'org-edit-src-exit
           "cC" 'org-edit-src-abort))
     #+END_SRC
+
 *** Python
-    Disable tabs in =python-mode=
+    Load an LSP:
     #+BEGIN_SRC emacs-lisp
-      (add-hook 'python-mode-hook (lambda () (setq indent-tabs-mode nil)))
+      (use-package lsp-python-ms
+        :hook (python-mode . (lambda ()
+                               (setq indent-tabs-mode nil)  ; disable tabs
+                               (require 'lsp-python-ms)
+                               (lsp-deferred))))
     #+END_SRC
+
 *** Rust
     #+BEGIN_SRC emacs-lisp
       (use-package rust-mode
+        :ensure-system-package (rls . "rustup component add rls rust-analysis rust-src")
         :mode "\\.rs\\'"
         :init
         (setq rust-format-on-save t))
@@ -646,6 +665,7 @@ Avoid loading old bytecode instead of newer source.
 *** YAML
     #+BEGIN_SRC emacs-lisp
       (use-package yaml-mode
+        :ensure-system-package (yaml-language-server . "npm i -g yaml-language-server")
         :mode ("\\.yml\\'"
                "\\.yaml\\'"))
     #+END_SRC
