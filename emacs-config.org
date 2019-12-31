@@ -45,10 +45,17 @@ Avoid loading old bytecode instead of newer source.
 
   Let's make a macro that calls =global-set-key= over an alist:
   #+BEGIN_SRC emacs-lisp
-    (defmacro my/many-global-set-key (key-alist)
+    (defsubst my/many-define-key (key-alist &optional keymap)
       "Evaluates `global-set-key' with the alist KEY-ALIST."
-      `(cl-loop for (key . command) in ,key-alist
-                do (global-set-key (kbd key) command)))
+      (let ((map (if (null keymap)
+                     (current-global-map)
+                   keymap)))
+        (cl-loop for (key . command) in key-alist do
+                 (define-key
+                   map
+                   (cond ((stringp key) (kbd key))
+                         (t key))
+                   command))))
   #+END_SRC
 
 * Track Emacs load time
@@ -287,12 +294,12 @@ Avoid loading old bytecode instead of newer source.
         :after (ivy)
         :config
         (counsel-mode +1)
-        (my/many-global-set-key '(("C-c C-r" . ivy-resume)
-                                  ("<f6>"    . ivy-resume)
-                                  ("<f2> u"  . counsel-unicode-char)
-                                  ("C-c g"   . counsel-git)
-                                  ("C-c j"   . counsel-git-grep)
-                                  ("C-c k"   . counsel-rg)))
+        (my/many-define-key '(("C-c C-r" . ivy-resume)
+                              ("<f6>"    . ivy-resume)
+                              ("<f2> u"  . counsel-unicode-char)
+                              ("C-c g"   . counsel-git)
+                              ("C-c j"   . counsel-git-grep)
+                              ("C-c k"   . counsel-rg)))
         (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
     #+END_SRC
 
