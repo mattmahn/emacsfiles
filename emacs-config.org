@@ -350,9 +350,10 @@ Avoid loading old bytecode instead of newer source.
     Do some magic with pairs!
     #+BEGIN_SRC emacs-lisp
       (use-package smartparens
-        :hook ((prog-mode-hook) . smartparens-mode)
+        :hook ((prog-mode) . smartparens-mode)
         :config
-        (require 'smartparens-config))
+        (require 'smartparens-config)
+        (sp-use-smartparens-bindings))
     #+END_SRC
 
 *** aggressive indentation
