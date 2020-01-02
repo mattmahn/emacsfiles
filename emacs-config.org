@@ -846,7 +846,7 @@ Avoid loading old bytecode instead of newer source.
        :ensure t
        :init
        (evil-leader/set-key
-         "gg"  #'magit-dispatch-popup
+         "gg"  #'magit-dispatch
          "gs"  #'magit-status
          "gd"  #'magit-diff-working-tree
          "gco" #'magit-checkout
@@ -863,9 +863,7 @@ Avoid loading old bytecode instead of newer source.
          "cC" 'with-editor-cancel)
        :config
        (setq truncate-lines nil) ; wrap lines
-       (define-key magit-status-mode-map (kbd "k") #'previous-line)
-       (define-key magit-status-mode-map (kbd "K") #'magit-discard)
-       (define-key magit-status-mode-map (kbd "j") #'next-line))
+       )
    #+END_SRC
 
    There's also a project called [[https://magit.vc/manual/forge/index.html][Forge]], also developed by the Magit maintainer, that provides nice integrations with GitHub, GitLab, etc.
