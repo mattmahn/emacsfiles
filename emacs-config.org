@@ -493,8 +493,7 @@ Avoid loading old bytecode instead of newer source.
     The LSP client for JavaScript/TypeScript needs to be installed via npm before you can use it: =npm install -g javascript-typescript-langserver=.
     #+BEGIN_SRC emacs-lisp
       (use-package js2-mode
-        :ensure-system-package ((typescript . "npm i -g typescript")
-                                (typescript-language-server . "npm i -g typescript-language-server"))
+        :ensure-system-package (typescript-language-server . "npm i -g typescript-language-server")
         :mode ("\\.js\\'"
                "\\.mjs\\'")
         :hook ((js2-mode typescript-mode-hook) . lsp)
