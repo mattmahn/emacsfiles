@@ -808,8 +808,8 @@ Avoid loading old bytecode instead of newer source.
     Eventually I'll put a custom mode-line confiuration here...
     #+BEGIN_SRC emacs-lisp
       (use-package doom-modeline
-	:ensure t
-	:hook (after-init . doom-modeline-init))
+        :ensure t
+        :hook (after-init . doom-modeline-init))
     #+END_SRC
 
 *** Scrolling
