@@ -474,6 +474,17 @@ Avoid loading old bytecode instead of newer source.
        :bind ("C-c \"" . poporg-dwim))
    #+END_SRC
 
+*** Clojure
+    #+BEGIN_SRC emacs-lisp
+      (use-package clojure-mode
+        :defer t
+        :init
+        (add-hook 'clojure-mode-hook (lambda () (clj-refactor-mode 1))))
+
+      (use-package cider
+        :defer t)
+    #+END_SRC
+
 *** Docker
     #+BEGIN_SRC emacs-lisp
       (use-package dockerfile-mode
