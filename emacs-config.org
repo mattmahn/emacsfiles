@@ -485,6 +485,12 @@ Avoid loading old bytecode instead of newer source.
         :defer t)
     #+END_SRC
 
+*** Dhall
+    #+BEGIN_SRC emacs-lisp
+      (use-package dhall-mode
+        :mode "\\.dhall\\'")
+    #+END_SRC
+
 *** Docker
     #+BEGIN_SRC emacs-lisp
       (use-package dockerfile-mode
