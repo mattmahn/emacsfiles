@@ -364,6 +364,7 @@ Avoid loading old bytecode instead of newer source.
         :config
         (global-aggressive-indent-mode t)
         (add-to-list 'aggressive-indent-excluded-modes 'html-mode)
+        (add-to-list 'aggressive-indent-excluded-modes 'dockerfile-mode)
         (add-to-list 'aggressive-indent-excluded-modes 'python-mode))
     #+END_SRC
 
