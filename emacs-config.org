@@ -203,8 +203,8 @@ Avoid loading old bytecode instead of newer source.
                                          (magit-log-mode         . normal)
                                          (magit-process-mode     . normal)
                                          (magit-popup-mode       . emacs)
-                                         ;; this allows vi-mode in shells
-                                         (term-mode              . emacs))
+                                         (term-mode              . emacs) ; this allows vi-mode in shells
+                                         (epresent-mode          . emacs))
                  do (evil-set-initial-state mode state))
         (evil-mode +1))
 
@@ -436,7 +436,9 @@ Avoid loading old bytecode instead of newer source.
    #+BEGIN_SRC emacs-lisp
      (use-package lsp-mode
        :commands (lsp lsp-deferred)
-       :hook (prog-mode . lsp-deferred))
+       :hook (prog-mode . lsp-deferred)
+       :init
+       (setq lsp-prefer-capf t))
 
      ;; TODO: make the window disappear/behave normally && hide line numbers
      (defun my/hide-frame-line-numbers (frame _window)
@@ -511,6 +513,7 @@ Avoid loading old bytecode instead of newer source.
     The LSP client for JavaScript/TypeScript needs to be installed via npm before you can use it: =npm install -g javascript-typescript-langserver=.
     #+BEGIN_SRC emacs-lisp
       (use-package js2-mode
+        :ensure t
         :ensure-system-package (typescript-language-server . "npm i -g typescript-language-server")
         :mode ("\\.js\\'"
                "\\.mjs\\'")
@@ -603,6 +606,11 @@ Avoid loading old bytecode instead of newer source.
         (evil-leader/set-key-for-mode 'emacs-lisp-mode
           "cc" 'org-edit-src-exit
           "cC" 'org-edit-src-abort))
+    #+END_SRC
+
+*** PowerShell
+    #+BEGIN_SRC emacs-lisp
+      (use-package powershell)
     #+END_SRC
 
 *** Python
@@ -861,6 +869,7 @@ Avoid loading old bytecode instead of newer source.
    #+BEGIN_SRC emacs-lisp
      (use-package magit
        :ensure t
+       :pin melpa-stable
        :init
        (evil-leader/set-key
          "gg"  #'magit-dispatch
@@ -903,6 +912,14 @@ Avoid loading old bytecode instead of newer source.
      (use-package hl-todo
        :config
        (global-hl-todo-mode +1))
+   #+END_SRC
+
+   Let's also use the sweet [[https://github.com/dandavison/delta][delta]] to provide prettier diffs:
+   #+BEGIN_SRC emacs-lisp
+     (use-package magit-delta
+       :if (executable-find "delta")
+       :requires (magit)
+       :hook ((magit-mode) . magit-delta-mode))
    #+END_SRC
 
    I like to have an indicator of what lines changed. =diff-hl= does a pretty good job, but doesn't play too nice with Flycheck.
