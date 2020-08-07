@@ -917,6 +917,13 @@ Avoid loading old bytecode instead of newer source.
          (diff-hl-margin-mode t)))
    #+END_SRC
 
+   Make sure we wrap to an appropriate line length:
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'git-commit-mode-hook
+               (lambda ()
+                 (set-fill-column 72))
+   #+END_SRC
+
 *** YOLO
     Let's emulate my ~git yolo~ alias in Magit: it simply uses a commit message
     from [[http:whatthecommit.com/index.txt][whatthecommit]] as the commit message.
