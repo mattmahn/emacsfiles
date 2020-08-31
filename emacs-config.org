@@ -323,7 +323,7 @@ Avoid loading old bytecode instead of newer source.
         :config
         (setq projectile-globally-ignored-directories
               (cl-union projectile-globally-ignored-directories
-                        '("node_modules"
+                        '("\\bnode_modules\\b"
                           "venv")))
         (setq projectile-globally-ignored-files
               (cl-union projectile-globally-ignored-files
@@ -908,6 +908,8 @@ Avoid loading old bytecode instead of newer source.
      (use-package magit-todos
        :requires (magit)
        :hook (magit-mode . magit-todos-mode)
+       :custom
+       (magit-todos-exclude-globs '("**/node_modules/**"))
        :init
        (unless (executable-find "nice") ; don't break Magit on systems that don't have `nice'
          (setq magit-todos-nice nil)))
