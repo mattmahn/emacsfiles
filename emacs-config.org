@@ -10,6 +10,11 @@ Avoid loading old bytecode instead of newer source.
   (setq load-prefer-newer t)
 #+END_SRC
 
+I also want to automatically make shebang-ed files executable:
+#+begin_src emacs-lisp
+  (add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
+#+end_src
+
 * My functions
 
   #+BEGIN_SRC emacs-lisp
