@@ -596,6 +596,7 @@ I also want to automatically make shebang-ed files executable:
               org-src-tab-acts-natively t
               org-src-window-setup 'current-window
               org-M-RET-may-split-line '((default . nil)) ; prevent M-RET from splitting lines
+              org-startup-folded 'content
               )
         ;; exporting
         (setq org-export-with-smart-quotes t
