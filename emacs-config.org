@@ -250,6 +250,15 @@ I also want to automatically make shebang-ed files executable:
       (define-key evil-visual-state-map (kbd ">") 'my/evil-shift-right-visual)
     #+END_SRC
 
+    Having it highlight the changed region when doing things like =ci"= / =yiW=:
+    #+begin_src emacs-lisp
+      (use-package evil-goggles
+        :after (evil)
+        :config
+        (evil-goggles-mode)
+        (evil-goggles-use-diff-faces))
+    #+end_src
+
 *** Editorconfig
     Because auto-enforced consistence is lovely.
     #+BEGIN_SRC emacs-lisp
