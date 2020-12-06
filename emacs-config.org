@@ -280,6 +280,7 @@ I also want to automatically make shebang-ed files executable:
     Ivy is "an interactive interface for completion in Emacs."
     #+BEGIN_SRC emacs-lisp
       (use-package ivy
+        :disabled
         :pin melpa-stable
         :diminish ivy-mode
         :init
@@ -294,12 +295,14 @@ I also want to automatically make shebang-ed files executable:
         (ivy-mode +1))
 
       (use-package swiper
+        :disabled
         :pin melpa-stable
         :after (ivy)
         :config
         (global-set-key "\C-s" 'swiper))
 
       (use-package counsel
+        :disabled
         :pin melpa-stable
         :after (ivy)
         :config
@@ -316,12 +319,43 @@ I also want to automatically make shebang-ed files executable:
     Let's make Ivy fancy.
     #+BEGIN_SRC emacs-lisp
       (use-package ivy-rich
+        :disabled
         :after (ivy)
         :init
         (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
         :config
         (ivy-rich-mode +1))
     #+END_SRC
+
+*** selectrum
+    #+begin_src emacs-lisp
+      (use-package selectrum
+        :init
+        (selectrum-mode +1))
+    #+end_src
+
+*** prescient
+    =prescient= enhances sorting and filtering
+    #+begin_src emacs-lisp
+      (use-package prescient
+        :ensure t
+        :config
+        (prescient-persist-mode +1))
+
+      (use-package company-prescient
+        :requires company
+        :config
+        (company-prescient-mode +1))
+      (use-package ivy-prescient
+        :requires ivy
+        :config
+        (ivy-prescient-mode +1))
+      (use-package selectrum-prescient
+        :after (:all selectrum prescient)
+        :requires selectrum
+        :config
+        (selectrum-prescient-mode +1))
+    #+end_src
 
 *** projectile
     I need a nice project mangement tool, =projectile= will be that.
@@ -332,8 +366,8 @@ I also want to automatically make shebang-ed files executable:
         :diminish projectile-mode
         :bind-keymap ("C-c p" . projectile-command-map)
         :init
-        (setq projectile-require-project-root nil
-              projectile-completion-system 'ivy)
+        (setq projectile-require-project-root t
+              projectile-enable-caching t)
         :config
         (setq projectile-globally-ignored-directories
               (cl-union projectile-globally-ignored-directories
@@ -466,6 +500,7 @@ I also want to automatically make shebang-ed files executable:
        )
 
      (use-package lsp-ivy
+       :disabled
        :requires (lsp-mode)
        :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol))
 
