@@ -902,6 +902,7 @@ I also want to automatically make shebang-ed files executable:
             mouse-wheel-scroll-amount '(1 ((shift) . 1) ((control) . nil))
             mouse-wheel-progressive-speed nil)
     #+END_SRC
+
 *** Themes
     #+BEGIN_SRC emacs-lisp
       (use-package ample-theme
