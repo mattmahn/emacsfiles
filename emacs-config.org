@@ -661,6 +661,22 @@ I also want to automatically make shebang-ed files executable:
           "cC" 'org-edit-src-abort))
     #+END_SRC
 
+*** PlantUML
+    [[https://plantuml.com/][PlantUML]]'s a pretty neat tool to make diagrams from text.
+    #+begin_src emacs-lisp
+      (use-package plantuml-mode
+        :mode "\\.plantuml\\'"
+        :custom
+        (plantuml-defult-exec-mode 'jar)
+        :config
+        (unless (file-exists-p plantuml-jar-path)
+          (plantuml-download-jar)))
+
+        (use-package flycheck-plantuml
+          :config
+          (flycheck-plantuml-setup))
+    #+end_src
+
 *** PowerShell
     #+BEGIN_SRC emacs-lisp
       (use-package powershell)
