@@ -276,57 +276,6 @@ I also want to automatically make shebang-ed files executable:
       (setq default-tab-width 4)
     #+END_SRC
 
-*** Ivy
-    Ivy is "an interactive interface for completion in Emacs."
-    #+BEGIN_SRC emacs-lisp
-      (use-package ivy
-        :disabled
-        :pin melpa-stable
-        :diminish ivy-mode
-        :init
-        (setq enable-recursive-minibuffers t
-              ivy-use-selectable-prompt t
-              ivy-use-virtual-buffers t
-              ivy-count-format "(%d/%d) ")
-        ;; set completion style (http://oremacs.com/swiper/#completion-styles)
-        (setq ivy-re-builders-alist
-              '((t . ivy--regex-ignore-order)))
-        :config
-        (ivy-mode +1))
-
-      (use-package swiper
-        :disabled
-        :pin melpa-stable
-        :after (ivy)
-        :config
-        (global-set-key "\C-s" 'swiper))
-
-      (use-package counsel
-        :disabled
-        :pin melpa-stable
-        :after (ivy)
-        :config
-        (counsel-mode +1)
-        (my/many-define-key '(("C-c C-r" . ivy-resume)
-                              ("<f6>"    . ivy-resume)
-                              ("<f2> u"  . counsel-unicode-char)
-                              ("C-c g"   . counsel-git)
-                              ("C-c j"   . counsel-git-grep)
-                              ("C-c k"   . counsel-rg)))
-        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
-    #+END_SRC
-
-    Let's make Ivy fancy.
-    #+BEGIN_SRC emacs-lisp
-      (use-package ivy-rich
-        :disabled
-        :after (ivy)
-        :init
-        (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-        :config
-        (ivy-rich-mode +1))
-    #+END_SRC
-
 *** selectrum
     #+begin_src emacs-lisp
       (use-package selectrum
@@ -346,10 +295,6 @@ I also want to automatically make shebang-ed files executable:
         :requires company
         :config
         (company-prescient-mode +1))
-      (use-package ivy-prescient
-        :requires ivy
-        :config
-        (ivy-prescient-mode +1))
       (use-package selectrum-prescient
         :after (:all selectrum prescient)
         :requires selectrum
@@ -498,11 +443,6 @@ I also want to automatically make shebang-ed files executable:
        (setq lsp-ui-sideline-ignore-duplicate t)
        ;; (add-hook 'lsp-ui-doc-frame-hook #'my/hide-frame-line-numbers)
        )
-
-     (use-package lsp-ivy
-       :disabled
-       :requires (lsp-mode)
-       :commands (lsp-ivy-workspace-symbol lsp-ivy-global-workspace-symbol))
 
      (use-package company-lsp
        :commands company-lsp
