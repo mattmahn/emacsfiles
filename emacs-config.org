@@ -180,6 +180,12 @@ I also want to automatically make shebang-ed files executable:
       (savehist-mode 1)
     #+END_SRC
 
+    TLS
+    #+begin_src emacs-lisp
+      (require 'gnutls)
+      (add-to-list 'gnutls-trustfiles (expand-file-name "~/crypto/nm/NMProdCACertBundle.pem"))
+    #+end_src
+
 *** evil-mode
     Emacs's editing sucks. Vim's modal editing is the best.
     #+BEGIN_SRC emacs-lisp
@@ -369,6 +375,9 @@ I also want to automatically make shebang-ed files executable:
        (setq completion-style '(partial-completion substring emacs22))
        :config
        (company-tng-configure-default))
+
+     (use-package company-box
+       :hook (company-mode . company-box-mode))
    #+END_SRC
 
    Lets also get a help pop-up when dawdling on an auto-complete suggestion:
@@ -445,6 +454,7 @@ I also want to automatically make shebang-ed files executable:
        )
 
      (use-package company-lsp
+       :disabled
        :commands company-lsp
        :config
        (push 'company-lsp company-backends)
@@ -501,6 +511,11 @@ I also want to automatically make shebang-ed files executable:
         :hook ((before-save . gofmt-before-save)))
     #+END_SRC
 
+*** Groovy
+    #+begin_src emacs-lisp
+      (use-package groovy-mode)
+    #+end_src
+
 *** JavaScript
     The LSP client for JavaScript/TypeScript needs to be installed via npm before you can use it: =npm install -g javascript-typescript-langserver=.
     #+BEGIN_SRC emacs-lisp
@@ -542,6 +557,12 @@ I also want to automatically make shebang-ed files executable:
         :defer t)
     #+END_SRC
 
+*** HTTP
+    Restclient allows making HTTP requests within Emacs
+    #+begin_src emacs-lisp
+      (use-package restclient)
+    #+end_src
+
 *** Markdown
     #+BEGIN_SRC emacs-lisp
       (use-package markdown-mode
@@ -572,6 +593,8 @@ I also want to automatically make shebang-ed files executable:
               org-src-window-setup 'current-window
               org-M-RET-may-split-line '((default . nil)) ; prevent M-RET from splitting lines
               org-startup-folded 'content
+              org-agenda-files (list
+                                (concat (file-name-as-directory org-directory) "agenda.org"))
               )
         ;; exporting
         (setq org-export-with-smart-quotes t
@@ -600,6 +623,20 @@ I also want to automatically make shebang-ed files executable:
           "cc" 'org-edit-src-exit
           "cC" 'org-edit-src-abort))
     #+END_SRC
+
+    Support Restclient stuffs in Org-mode
+    #+begin_src emacs-lisp
+      (use-package ob-restclient
+        :after (:all org restclient)
+        :config
+        (org-babel-do-load-languages 'org-babel-do-load-languages '((restclient . t))))
+    #+end_src
+
+*** Rego
+    Rego is the policy language used by [[https://openpolicyagent.org/][Open Policy Agent]].
+    #+begin_src emacs-lisp
+      (use-package rego-mode)
+    #+end_src
 
 *** PlantUML
     [[https://plantuml.com/][PlantUML]]'s a pretty neat tool to make diagrams from text.
@@ -775,9 +812,16 @@ I also want to automatically make shebang-ed files executable:
    What's the most important part about a user interface? The font!
    #+BEGIN_SRC emacs-lisp
      (pcase system-type
-       ('darwin (add-to-list 'default-frame-alist '(font . "Iosevka-12")))
+       ;; ('darwin (add-to-list 'default-frame-alist '(font . "Iosevka-12")))
+       ('darwin (add-to-list 'default-frame-alist '(font . "Rec Mono Linear-12")))
        (_       (add-to-list 'default-frame-alist '(font . "Iosevka-10:antialias=natural"))))
    #+END_SRC
+
+   Let's embiggen the initial window size:
+   #+begin_src emacs-lisp
+     (dolist (item '((width . 90)))
+       (add-to-list 'default-frame-alist item))
+   #+end_src
 
    Match the titlebar color on macOS
    #+BEGIN_SRC emacs-lisp
@@ -797,7 +841,7 @@ I also want to automatically make shebang-ed files executable:
 
    I really don't understand why text editors don't have line numbers enabled by default... Let's turn them and relative numbers on:
    #+BEGIN_SRC emacs-lisp
-     (setq-default display-line-numbers 'relative)
+     (setq-default display-line-numbers 'visual)
    #+END_SRC
 
    Rainbow parenthesis are really nice to have, assuming it doesn't slow down your editor. They basically make it easy to spot matching parenthesis/braces/brackets.
@@ -879,7 +923,7 @@ I also want to automatically make shebang-ed files executable:
    #+BEGIN_SRC emacs-lisp
      (use-package magit
        :ensure t
-       :pin melpa-stable
+       ;; :pin melpa-stable
        :init
        (evil-leader/set-key
          "gg"  #'magit-dispatch
@@ -986,6 +1030,12 @@ I also want to automatically make shebang-ed files executable:
          (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
          (abort-recursive-edit)))
    #+END_SRC
+** GPG
+   This should let me enter my GPG passphrase in Emacs, so it can actually be used
+   #+begin_src emacs-lisp
+     (setq epa-pinentry-mode 'loopback)
+   #+end_src
+
 * Show package load time
   Here's where we report how long it took to load all installed packages to the Messages buffer.
   #+BEGIN_SRC emacs-lisp
